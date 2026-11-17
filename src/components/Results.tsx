@@ -19,11 +19,29 @@ function Why({ team, ctx }: { team: string[]; ctx: Parameters<typeof explainTeam
   )
 }
 
+/** Says what is left over and, more importantly, why another team could not be formed from it. */
+function Spare({ teams, leftover, spare }: { teams: string[][]; leftover: string[]; spare: Record<string, number> }) {
+  const names = Object.keys(spare)
+  if (!names.length) return <p className="hint">Every Resonator and every use is on a team.</p>
+  const sup = names.filter((n) => BY_NAME[n].role === 'Support')
+  const rest = names.filter((n) => BY_NAME[n].role !== 'Support')
+  const second = names.filter((n) => !leftover.includes(n))
+  const everyTeamHasSupport = teams.every((t) => t.some((n) => BY_NAME[n].role === 'Support'))
+  return (
+    <div className="hint spare">
+      {leftover.length > 0 && <p>Not used at all: {leftover.join(', ')}.</p>}
+      {second.length > 0 && <p>Second use not needed or not placeable: {second.join(', ')}.</p>}
+      {sup.length > 0 && everyTeamHasSupport && <p>Supports left over ({sup.map((n) => (spare[n] > 1 ? `${n} x${spare[n]}` : n)).join(', ')}): a team never holds two Supports and every team already has one, so these uses cannot be placed.</p>}
+      {rest.length > 0 && <p>Only {rest.reduce((a, n) => a + spare[n], 0)} non-Support use{rest.length === 1 && spare[rest[0]] === 1 ? '' : 's'} left ({rest.join(', ')}). A team needs three different Resonators with at most one Support, so there is not enough left for another one.</p>}
+    </div>
+  )
+}
+
 export function Results({ plan, busy, stale, showWhy, roster }: { plan: Plan | null; busy: boolean; stale: boolean; showWhy: boolean; roster: string[] }) {
   if (!plan) return <p className="empty">Press Build Teams to see your teams here.</p>
   if (plan.kind === 'empty') return <p className="empty">Select at least 3 Resonators in step 1 to see teams here.</p>
   if (plan.kind === 'fix') return <p className="empty bad">Finish or fix your teams in step 2 to build the rest.</p>
-  const { teams, leftover, manual, summary } = plan
+  const { teams, leftover, spare, manual, summary } = plan
   return (
     <div className={busy || stale ? 'results busy' : 'results'}>
       {stale && <p className="hint stale" role="status">Your roster changed. Press Build Teams to update.</p>}
@@ -51,7 +69,7 @@ export function Results({ plan, busy, stale, showWhy, roster }: { plan: Plan | n
           </motion.article>
         ))}
       </div>
-      {teams.length > 0 && <p className="hint">{leftover.length ? `Not used: ${leftover.join(', ')}.` : 'Every Resonator is on a team.'}</p>}
+      {teams.length > 0 && <Spare teams={teams} leftover={leftover} spare={spare} />}
     </div>
   )
 }

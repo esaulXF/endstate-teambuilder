@@ -5,7 +5,7 @@ export type Slot = string | null
 export type Plan =
   | { kind: 'empty' } // fewer than 3 Resonators selected
   | { kind: 'fix' } // own teams exist but are incomplete or break a rule
-  | { kind: 'ready'; summary: string; teams: Team[]; leftover: string[]; manual: string[][] }
+  | { kind: 'ready'; summary: string; teams: Team[]; leftover: string[]; spare: Record<string, number>; manual: string[][] }
 
 export function manualProblems(manual: Slot[][], usesOf: (n: string) => number) {
   const usage = countUsage(manual)
@@ -27,5 +27,8 @@ export function planRest(roster: string[], manual: Slot[][], usesOf: (n: string)
   const summary = own.length
     ? `${pool.length} Resonators left after your ${own.length === 1 ? 'team' : `${own.length} teams`}.${usedUp.length ? ` Used up: ${usedUp.join(', ')}.` : ''}`
     : `Full roster: ${pool.length} Resonators.`
-  return { kind: 'ready', summary, teams, leftover: pool.filter((n) => !inTeams.has(n)), manual: own }
+  const spare: Record<string, number> = {}
+  const usedHere = countUsage(teams)
+  pool.forEach((n) => { const r = caps[n] - (usedHere[n] || 0); if (r > 0) spare[n] = r })
+  return { kind: 'ready', summary, teams, leftover: pool.filter((n) => !inTeams.has(n)), spare, manual: own }
 }
