@@ -18,6 +18,7 @@ export default function App() {
   const [rosterList, setRosterList] = usePersistent<string[]>('wuwa-endstate-roster', [], (r) =>
     onlyOneRover(Array.isArray(r) ? r.filter((n) => typeof n === 'string' && n in BY_NAME) : []),
   )
+  const [alt, setAlt] = usePersistent<boolean>('wuwa-endstate-alt', false, (r) => r === true)
   const [why, setWhy] = usePersistent<boolean>('wuwa-endstate-why', false, (r) => r === true)
   const [cycle, setCycle] = usePersistent<boolean>('wuwa-endstate-cycle-v2', false)
   const [manual, setManual] = usePersistent<Slot[][]>('wuwa-endstate-manual-v2', [], (r) =>
@@ -25,6 +26,11 @@ export default function App() {
   )
   const [built, setBuilt] = useState<{ plan: Plan; key: string } | null>(null)
   const [busy, setBusy] = useState(false)
+
+  useEffect(() => {
+    if (alt) document.documentElement.dataset.palette = 'alt'
+    else delete document.documentElement.dataset.palette
+  }, [alt])
 
   const roster = useMemo(() => new Set(rosterList), [rosterList])
   const usesOf = (n: string) => usesFor(n, cycle)
@@ -60,6 +66,12 @@ export default function App() {
 
   return (
     <div className="shell">
+      <div className="topbar">
+        <label className="switch">
+          <input type="checkbox" checked={alt} onChange={(e) => setAlt(e.target.checked)} />
+          <span>Alt Color</span>
+        </label>
+      </div>
       <header className="hero">
         <div>
           <h1>Endstate Matrix Team Builder</h1>
@@ -76,7 +88,7 @@ export default function App() {
       </header>
 
       <section className="panel" aria-labelledby="s1">
-        <h2 id="s1"><span className="step">1</span>Your roster</h2>
+        <h2 id="s1"><span className="step">1</span>Your Roster</h2>
         <Roster roster={roster} cycleBonus={cycle} onToggle={toggle} onSetMany={setMany} />
       </section>
 
