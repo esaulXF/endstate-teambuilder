@@ -271,6 +271,6 @@ select.field { cursor: pointer; }
   .shell > .panel:nth-of-type(3) { grid-column: 2; grid-row: 4; }
   .hero h1 { font-size: clamp(44px, 4.2vw, 84px); }
 }
-@media (min-width: 1700px) { .shell { zoom: 1.15; } }
+@media (min-width: 1700px) { .shell { zoom: 0.8; } }
 @media (min-width: 2100px) { .shell { zoom: 1.35; } }
 @media (min-width: 2700px) { .shell { zoom: 1.7; } }
