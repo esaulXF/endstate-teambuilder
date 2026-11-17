@@ -58,7 +58,7 @@ export const PERMANENT_TWO_USE = new Set(['Shorekeeper', 'Verina', 'Mornye', 'Ba
 
 // Extra second uses from the current challenge cycle (Emergency Agent bonus).
 // PLACEHOLDER for Adversity Vanguard (3.8): update this list when the next cycle starts.
-export const CYCLE_BONUS = { name: 'Adversity Vanguard (3.8)', resonators: ['Chisa', 'Denia'] }
+export const CYCLE_BONUS = { name: 'Adversity Vanguard', patch: '3.8', resonators: ['Chisa', 'Denia'] }
 
 export function usesFor(name: string, cycleBonus: boolean): number {
   if (PERMANENT_TWO_USE.has(name)) return 2

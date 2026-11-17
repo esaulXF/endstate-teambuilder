@@ -80,7 +80,7 @@ export function Roster({ roster, cycleBonus, onToggle, onSetMany }: Props) {
               <span className="tile-text">
                 <span className="tile-name">{c.name}{uses === 2 && <b className={`x2${cyc ? ' cyc' : ''}`} title={cyc ? 'Second use from the current cycle' : 'Can be used in two teams'}>×2</b>}</span>
                 <span className="tile-meta"><Stars rarity={c.rarity} /> {c.element}, {c.role}</span>
-                <span className="tile-meta">Released in {c.version}</span>
+                <span className="tile-meta">v{c.version}</span>
               </span>
               <span className="tick" aria-hidden="true">✓</span>
             </motion.button>

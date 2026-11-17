@@ -61,12 +61,10 @@ export default function App() {
       <header className="hero">
         <div>
           <h1>Endstate Matrix team builder</h1>
-          <p className="lede">Mark the Resonators you own and the builder splits them into teams of three. Most Resonators can join one team. Shorekeeper, Verina, Mornye, Baizhi, Suisui and Buling can join two. An unofficial fan tool, not affiliated with Kuro Games.</p>
           <label className="switch">
             <input type="checkbox" checked={cycle} onChange={(e) => setCycle(e.target.checked)} />
-            <span>Include current cycle bonuses</span>
+            <span>Include cycle bonuses <b className="cycle-tag">{CYCLE_BONUS.name}, patch {CYCLE_BONUS.patch}</b></span>
           </label>
-          <p className="hint">{cycle ? `Second use added for ${CYCLE_BONUS.resonators.join(' and ')} (${CYCLE_BONUS.name}).` : 'Off: only the permanent two-use supports can be used twice.'}</p>
         </div>
         <motion.div className="readout" key={capacity} initial={{ opacity: 0.4, scale: 0.94 }} animate={{ opacity: 1, scale: 1 }} transition={{ type: 'spring', stiffness: 260, damping: 18 }} aria-live="polite">
           <span className="readout-num">{capacity}</span>
@@ -77,13 +75,11 @@ export default function App() {
 
       <section className="panel" aria-labelledby="s1">
         <h2 id="s1"><span className="step">1</span>Your roster</h2>
-        <p className="lede">Select the Resonators you have. Your roster saves in this browser automatically.</p>
         <Roster roster={roster} cycleBonus={cycle} onToggle={toggle} onSetMany={setMany} />
       </section>
 
       <section className="panel" aria-labelledby="s2">
         <h2 id="s2"><span className="step">2</span>Your own teams <small>optional</small></h2>
-        <p className="lede">Build teams you already want. Each team needs 3 Resonators and is checked against the rules before anything is sent on.</p>
         <OwnTeams roster={rosterList} teams={manual} usesOf={usesOf} onChange={setManual} onSendAll={sendAll} onSendRemaining={sendRemaining} />
       </section>
 
@@ -92,7 +88,7 @@ export default function App() {
         <Results pool={pool} teams={built} leftover={leftover} onBuild={build} />
       </section>
 
-      <footer className="foot">Unofficial fan project. Wuthering Waves and all related names belong to Kuro Games. Power ratings and team synergies are rough estimates and not official data.</footer>
+      <footer className="foot">Unofficial fan tool, not affiliated with Kuro Games. Ratings and synergies are rough estimates.</footer>
     </div>
   )
 }

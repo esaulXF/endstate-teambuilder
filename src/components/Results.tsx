@@ -15,13 +15,13 @@ interface Props {
 export function Results({ pool, teams, leftover, onBuild }: Props) {
   return (
     <div>
-      <p className="lede" role="status">
-        {!pool
-          ? 'Nothing sent yet. Use a send button in step 2 first.'
-          : pool.manual.length
-            ? `Using the ${pool.names.length} Resonators left after your ${pool.manual.length} team${pool.manual.length > 1 ? 's' : ''}.${pool.usedUp.length ? ` Already used and removed: ${pool.usedUp.join(', ')}.` : ''}`
-            : `Using your full roster: ${pool.names.length} Resonators.`}
-      </p>
+      {pool && (
+        <p className="lede" role="status">
+          {pool.manual.length
+            ? `${pool.names.length} Resonators left after your ${pool.manual.length === 1 ? 'team' : `${pool.manual.length} teams`}.${pool.usedUp.length ? ` Used up: ${pool.usedUp.join(', ')}.` : ''}`
+            : `Full roster: ${pool.names.length} Resonators.`}
+        </p>
+      )}
       {pool && (
         <div className="pool">
           {pool.names.map((n) => (
@@ -31,9 +31,7 @@ export function Results({ pool, teams, leftover, onBuild }: Props) {
           ))}
         </div>
       )}
-      <div className="toolbar"><button className="btn primary" disabled={!pool} onClick={onBuild}>Build teams</button></div>
-      <p className="hint">Builds as many full teams as the sent Resonators allow. Resonators already in your own teams are removed from the pool. Shared supports keep one use if you used them once. Stability Accords uses up to 3 teams, and Singularity Expansion has no limit.</p>
-
+      <div className="toolbar"><button className="btn primary" disabled={!pool} title={pool ? undefined : 'Send a roster from step 2 first'} onClick={onBuild}>Build teams</button></div>
       {teams && (
         <>
           {teams.length === 0 && <p className="empty">Not enough Resonators for a full team.</p>}
@@ -58,8 +56,7 @@ export function Results({ pool, teams, leftover, onBuild }: Props) {
               </motion.article>
             ))}
           </div>
-          <p className="hint">{leftover.length ? `Not used: ${leftover.join(', ')}.` : 'Every Resonator in the pool is on a team.'}</p>
-          <p className="hint">Teams are listed strongest first. Ratings and synergies are rough estimates, not official data, so treat the result as a starting point.</p>
+          <p className="hint">{leftover.length ? `Not used: ${leftover.join(', ')}.` : 'Every Resonator is on a team.'}</p>
         </>
       )}
     </div>

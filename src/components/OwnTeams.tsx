@@ -18,19 +18,16 @@ export function OwnTeams({ roster, teams, usesOf, onChange, onSendAll, onSendRem
   const problems = teams.map((t) => teamProblem(t, usage, usesOf))
   const allValid = teams.length > 0 && problems.every((p) => p === null)
   const sorted = [...roster].sort((a, b) => a.localeCompare(b))
-  const slotsLeft = sorted.reduce((a, n) => a + Math.max(0, usesOf(n) - (usage[n] || 0)), 0)
 
   const setSlot = (ti: number, si: number, v: Slot) => onChange(teams.map((t, i) => (i === ti ? t.map((x, j) => (j === si ? v : x)) : t)))
 
-  let status = ''
-  if (teams.length) {
-    status = allValid
-      ? `${teams.length > 1 ? `All ${teams.length} teams follow` : 'Your team follows'} the rules and can be built like this. ${slotsLeft < 3 ? 'Not enough Resonators are left for another team.' : `${slotsLeft} team slots can still be filled from what is left.`}`
-      : `Fix your teams before sending: ${problems.map((p, i) => (p ? `team ${i + 1} ${p}` : '')).filter(Boolean).join('; ')}.`
-  }
-  const hint = teams.length
-    ? 'Send roster is only available while no teams are added here. Remove your teams to use it.'
-    : roster.length < 3 ? 'Select at least 3 Resonators in step 1 first.' : 'Send remaining roster unlocks once you add a valid team.'
+  const status = teams.length
+    ? allValid
+      ? teams.length > 1 ? `All ${teams.length} teams are valid.` : 'Your team is valid.'
+      : `Fix before sending: ${problems.map((p, i) => (p ? `team ${i + 1} ${p}` : '')).filter(Boolean).join('; ')}.`
+    : ''
+  const sendAllReason = teams.length ? 'Remove your teams to send the full roster' : roster.length < 3 ? 'Select at least 3 Resonators first' : undefined
+  const sendRemReason = allValid ? undefined : 'Add at least one complete, valid team first'
 
   return (
     <div>
@@ -51,17 +48,16 @@ export function OwnTeams({ roster, teams, usesOf, onChange, onSendAll, onSendRem
                   ))}
                 </select>
               ))}
-              <p className={problems[ti] ? 'note bad' : 'note ok'}>{problems[ti] ? `Not valid: ${problems[ti]}` : 'Valid'}</p>
+              {problems[ti] && <p className="note bad">{problems[ti][0].toUpperCase() + problems[ti].slice(1)}</p>}
             </motion.div>
           ))}
         </AnimatePresence>
       </div>
       {status && <p className={`status ${allValid ? 'ok' : 'bad'}`} role="status">{status}</p>}
       <div className="toolbar">
-        <button className="btn primary" disabled={teams.length > 0 || roster.length < 3} onClick={onSendAll}>Send roster</button>
-        <button className="btn primary" disabled={!allValid} onClick={onSendRemaining}>Send remaining roster</button>
+        <button className="btn primary" disabled={teams.length > 0 || roster.length < 3} title={sendAllReason} onClick={onSendAll}>Send roster</button>
+        <button className="btn primary" disabled={!allValid} title={sendRemReason} onClick={onSendRemaining}>Send remaining roster</button>
       </div>
-      <p className="hint">{hint}</p>
     </div>
   )
 }
