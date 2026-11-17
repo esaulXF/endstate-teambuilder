@@ -67,10 +67,13 @@ export default function App() {
   return (
     <div className="shell">
       <div className="topbar">
-        <label className="switch">
-          <input type="checkbox" checked={light} onChange={(e) => setLight(e.target.checked)} />
-          <span>Light Mode</span>
-        </label>
+        <span className="theme-label" id="theme-label">{light ? 'Light Mode' : 'Dark Mode'}</span>
+        <button type="button" className="theme-toggle" role="switch" aria-checked={light} aria-labelledby="theme-label" onClick={() => setLight(!light)}>
+          <span className="knob">
+            <svg className="ico moon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5a.6.6 0 0 0-.8-.7A9.5 9.5 0 1 0 21.2 15a.6.6 0 0 0-.7-.8Z" /></svg>
+            <svg className="ico sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4" fill="currentColor" /><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8" /></svg>
+          </span>
+        </button>
       </div>
       <header className="hero">
         <div>
