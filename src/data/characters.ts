@@ -20,7 +20,7 @@ const E: Record<string, Element> = { F: 'Fusion', G: 'Glacio', A: 'Aero', E: 'El
 const R: Record<string, Role> = { D: 'Main DPS', S: 'Sub-DPS', H: 'Support' }
 
 // name,element,role,power
-const RAW = `Aemeath,F,D,10|Aalto,A,S,3|Augusta,E,D,8|Baizhi,G,H,4|Brant,F,H,6|Buling,E,H,5|Calcharo,E,D,6|Camellya,H,D,8|Cantarella,H,S,7|Carlotta,G,D,8|Cartethyia,A,D,8|Changli,F,D,8|Chisa,H,D,8|Chixia,F,D,3|Ciaccona,A,S,7|Danjin,H,D,4|Denia,F,S,8|Encore,F,D,6|Galbrena,F,D,9|Hiyuki,G,D,9|Hsin,E,D,9|Iuno,A,S,8|Jianxin,A,H,5|Jingran,F,D,8|Jinhsi,S,D,8|Jiyan,A,D,7|Lily,S,H,9|Lingyang,G,D,5|Lucilla,G,S,8|Lucy,S,D,8|Lumi,E,H,3|Lupa,F,S,8|Luuk Herssen,S,D,8|Lynae,S,S,8|Mornye,F,H,9|Mortefi,F,S,3|Phoebe,S,D,8|Phrolova,H,D,8|Qingxiao,A,D,9|Qiuyuan,A,S,8|Rebecca,E,S,8|Roccia,H,S,6|Rover (Aero),A,S,5|Rover (Electro),E,S,5|Rover (Havoc),H,D,6|Rover (Spectro),S,D,6|Sanhua,G,S,6|Shorekeeper,S,H,10|Sigrika,A,D,8|Suisui,G,H,8|Suoming,E,S,8|Taoqi,H,H,4|Verina,S,H,7|Xiangli Yao,E,D,8|Yangyang,A,S,3|Yangyang: Xuanling,H,D,7|Yinlin,E,S,7|Youhu,G,H,4|Yuanwu,E,S,3|Zani,S,D,8|Zhezhi,G,S,7`
+const RAW = `Aemeath,F,D,10|Aalto,A,S,3|Augusta,E,D,8|Baizhi,G,H,4|Brant,F,H,6|Buling,E,H,5|Calcharo,E,D,6|Camellya,H,D,8|Cantarella,H,S,7|Carlotta,G,D,8|Cartethyia,A,D,8|Changli,F,D,8|Chisa,H,S,8|Chixia,F,D,3|Ciaccona,A,S,7|Danjin,H,S,4|Denia,F,S,8|Encore,F,D,6|Galbrena,F,D,9|Hiyuki,G,D,9|Hsin,E,D,9|Iuno,A,S,8|Jianxin,A,H,5|Jingran,F,D,8|Jinhsi,S,D,8|Jiyan,A,D,7|Lily,S,H,9|Lingyang,G,D,5|Lucilla,G,S,8|Lucy,S,D,8|Lumi,E,H,3|Lupa,F,S,8|Luuk Herssen,S,D,8|Lynae,S,S,8|Mornye,F,H,9|Mortefi,F,S,3|Phoebe,S,D,8|Phrolova,H,D,8|Qingxiao,A,D,9|Qiuyuan,A,S,8|Rebecca,E,S,8|Roccia,H,S,6|Rover (Aero),A,H,5|Rover (Electro),E,S,5|Rover (Havoc),H,D,6|Rover (Spectro),S,S,6|Sanhua,G,S,6|Shorekeeper,S,H,10|Sigrika,A,D,8|Suisui,G,H,8|Suoming,E,S,8|Taoqi,H,H,4|Verina,S,H,7|Xiangli Yao,E,D,8|Yangyang,A,S,3|Yangyang: Xuanling,H,D,7|Yinlin,E,S,7|Youhu,G,H,4|Yuanwu,E,S,3|Zani,S,D,8|Zhezhi,G,S,7`
 
 // Release version per Resonator. Unconfirmed: Denia (3.3) and Rover (Havoc) (1.0).
 const VERSIONS: [string, string][] = [
@@ -54,24 +54,15 @@ export const RESONATORS: Resonator[] = RAW.split('|').map((s) => {
 
 export const BY_NAME: Record<string, Resonator> = Object.fromEntries(RESONATORS.map((c) => [c.name, c]))
 
-// Known good pairings and trios (rough, from guides). Used as a small score bonus.
-const GROUPS: string[][] = [
-  ['Lucy', 'Rebecca'], ['Galbrena', 'Qiuyuan', 'Lily'], ['Sigrika', 'Qiuyuan', 'Lily'], ['Sigrika', 'Lucilla', 'Lily'],
-  ['Hsin', 'Suoming', 'Lily'], ['Hsin', 'Suoming', 'Shorekeeper'], ['Aemeath', 'Lynae', 'Mornye'], ['Galbrena', 'Denia', 'Lupa'],
-  ['Luuk Herssen', 'Sanhua', 'Mornye'], ['Carlotta', 'Zhezhi', 'Shorekeeper'], ['Zani', 'Phoebe', 'Rover (Spectro)'],
-  ['Chisa', 'Yangyang: Xuanling', 'Suisui'], ['Cartethyia', 'Ciaccona', 'Rover (Aero)'], ['Augusta', 'Iuno', 'Shorekeeper'],
-  ['Jinhsi', 'Yinlin', 'Shorekeeper'],
-]
-export const SYNERGY = new Set<string>()
-GROUPS.forEach((g) => g.forEach((a) => g.forEach((b) => { if (a < b) SYNERGY.add(`${a}|${b}`) })))
-
 // ---- Endstate Matrix uses ----
 // Default: every Resonator has 1 use. These support characters have 2 permanently.
 export const PERMANENT_TWO_USE = new Set(['Shorekeeper', 'Verina', 'Mornye', 'Baizhi', 'Suisui', 'Buling', 'Lily'])
 
 // Extra second uses from the current challenge cycle (Emergency Agent bonus).
-// PLACEHOLDER for Adversity Vanguard (3.8): update this list when the next cycle starts.
-export const CYCLE_BONUS = { name: 'Adversity Vanguard', patch: '3.8', resonators: ['Chisa', 'Denia'] }
+// Chisa was the 3.5 agent and does NOT get a second use in 3.8. The 3.8 agent is not confirmed anywhere
+// I could find, so Denia (the 3.6 agent) stays as a placeholder to keep the toggle testable.
+// UNCONFIRMED: replace this list when the real 3.8 / next-cycle agent is known.
+export const CYCLE_BONUS = { name: 'Adversity Vanguard', patch: '3.8', confirmed: false, resonators: ['Denia'] }
 
 export function usesFor(name: string, cycleBonus: boolean): number {
   if (PERMANENT_TWO_USE.has(name)) return 2

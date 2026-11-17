@@ -69,3 +69,19 @@ if (withOwn.kind === 'ready') {
 assert.equal(planRest(all, [['Aemeath', 'Lynae', null]], usesNoCycle).kind, 'fix')
 assert.equal(planRest(['Aemeath', 'Lynae'], [], usesNoCycle).kind, 'empty')
 console.log('plan and ordering tests passed')
+
+// Synergy database
+import { PROFILES, BUILDS, bestBuild, teamLinks } from '../src/data/synergy'
+import { scoreTeam } from '../src/lib/solver'
+assert.equal(BY_NAME['Chisa'].role, 'Sub-DPS', 'Chisa is a sub-DPS/support, not a main DPS')
+assert.equal(usesFor('Chisa', true), 1, 'Chisa has no second use in 3.8')
+for (const n of all) assert.ok(PROFILES[n], `missing profile for ${n}`)
+for (const n of Object.keys(PROFILES)) assert.ok(BY_NAME[n], `profile for unknown Resonator ${n}`)
+for (const b of BUILDS) { b.team.forEach((n) => assert.ok(BY_NAME[n], `unknown ${n} in build ${b.team.join('/')}`)); assert.equal(new Set(b.team).size, 3) }
+const dps = (n: string) => BY_NAME[n].role !== 'Support'
+const links = teamLinks(['Yangyang: Xuanling', 'Chisa', 'Suisui'], dps)
+assert.ok(links.some((l) => l.from === 'Chisa' && l.to === 'Suisui' && l.effect === 'Havoc Bane'), 'Havoc Bane should link to Negative Status payoff')
+assert.ok(scoreTeam(['Yangyang: Xuanling', 'Chisa', 'Suisui']) > scoreTeam(['Yangyang: Xuanling', 'Lumi', 'Taoqi']), 'known T0 team beats filler')
+assert.ok(scoreTeam(['Hsin', 'Suoming', 'Lily']) > scoreTeam(['Hsin', 'Aalto', 'Taoqi']))
+assert.equal(bestBuild(['Qingxiao', 'Denia', 'Mornye'])?.build.tier, 'T0')
+console.log('synergy tests passed')

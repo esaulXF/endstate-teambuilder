@@ -2,6 +2,21 @@ import { motion } from 'framer-motion'
 import { BY_NAME } from '../data/characters'
 import { ELEMENT_COLOR, Medal, Stars } from './Medal'
 import type { Plan } from '../lib/plan'
+import { ARCHETYPES, bestBuild, teamLinks } from '../data/synergy'
+
+const isDps = (n: string) => BY_NAME[n].role !== 'Support'
+
+function Tags({ team }: { team: string[] }) {
+  const bb = bestBuild(team)
+  const links = teamLinks(team, isDps).filter((l, i, a) => a.findIndex((x) => x.from === l.from && x.effect === l.effect) === i).slice(0, 2)
+  if (!bb && !links.length) return null
+  return (
+    <div className="tags">
+      {bb && <span className={`tag tier-${bb.build.tier.replace('.', '')}`} title={bb.exact ? 'Known build' : 'Close to a known build'}>{bb.build.tier} {ARCHETYPES[bb.build.arch].label}{bb.exact ? '' : ' (close)'}</span>}
+      {links.map((l) => <span key={l.from + l.to + l.effect} className="tag">{l.from} gives {l.to} {l.effect}</span>)}
+    </div>
+  )
+}
 
 export function Results({ plan, busy }: { plan: Plan | null; busy: boolean }) {
   if (!plan || plan.kind === 'empty') return <p className="empty">Select at least 3 Resonators in step 1 to see teams here.</p>
@@ -29,6 +44,7 @@ export function Results({ plan, busy }: { plan: Plan | null; busy: boolean }) {
                 </div>
               )
             })}
+            <Tags team={t} />
           </motion.article>
         ))}
       </div>

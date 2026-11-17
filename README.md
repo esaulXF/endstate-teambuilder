@@ -28,6 +28,7 @@ Everything lives in `src/data/characters.ts`:
 
 - New Resonator: add it to `RAW`, to `VERSIONS`, and to `FOUR_STAR` if it is 4-star.
 - New cycle: edit `CYCLE_BONUS` (the name and the Resonators who get +1 Vigor).
+- Synergies and builds: edit `src/data/synergy.ts` (`PROFILES` for applied/wanted effects, `BUILDS` for tiered teams).
 - Permanent two-use supports: `PERMANENT_TWO_USE`.
 
 ## Portraits (optional)

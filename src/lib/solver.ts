@@ -1,8 +1,9 @@
-import { BY_NAME, SYNERGY } from '../data/characters'
+import { BY_NAME } from '../data/characters'
+import { synergyScore } from '../data/synergy'
 
 export type Team = string[] // up to 3 Resonator names
 
-/** Rough team score: sum of power, one main DPS, one support, known pairings. Not official. */
+/** Team score: power, role balance, effect links between kits and known build tiers (see data/synergy.ts). Not official. */
 export function scoreTeam(team: Team): number {
   const m = team.map((n) => BY_NAME[n])
   let s = 0, dps = 0, sup = 0
@@ -12,11 +13,7 @@ export function scoreTeam(team: Team): number {
   if (dps > 1) s -= 2 * (dps - 1)
   if (sup === 1) s += 2
   if (sup > 1) s -= 4
-  for (let a = 0; a < team.length; a++)
-    for (let b = a + 1; b < team.length; b++) {
-      const [x, y] = team[a] < team[b] ? [team[a], team[b]] : [team[b], team[a]]
-      if (SYNERGY.has(`${x}|${y}`)) s += 3
-    }
+  if (m.length === 3) s += synergyScore(team, (n) => BY_NAME[n].role !== 'Support')
   return s
 }
 
