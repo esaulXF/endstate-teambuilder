@@ -18,6 +18,7 @@ export default function App() {
   const [rosterList, setRosterList] = usePersistent<string[]>('wuwa-endstate-roster', [], (r) =>
     onlyOneRover(Array.isArray(r) ? r.filter((n) => typeof n === 'string' && n in BY_NAME) : []),
   )
+  const [why, setWhy] = usePersistent<boolean>('wuwa-endstate-why', false, (r) => r === true)
   const [cycle, setCycle] = usePersistent<boolean>('wuwa-endstate-cycle-v2', false)
   const [manual, setManual] = usePersistent<Slot[][]>('wuwa-endstate-manual-v2', [], (r) =>
     Array.isArray(r) ? r.map((t) => (Array.isArray(t) ? t.slice(0, 3).map((n) => (typeof n === 'string' && n in BY_NAME ? n : null)) : [null, null, null])) : [],
@@ -85,7 +86,11 @@ export default function App() {
 
       <section className="panel" aria-labelledby="s3">
         <h2 id="s3"><span className="step">3</span>Build the rest</h2>
-        <Results plan={plan} busy={busy} />
+        <label className="switch why-switch">
+          <input type="checkbox" checked={why} onChange={(e) => setWhy(e.target.checked)} />
+          <span>Show team reasoning</span>
+        </label>
+        <Results plan={plan} busy={busy} showWhy={why} />
       </section>
 
       <footer className="foot">Unofficial fan tool, not affiliated with Kuro Games. Ratings and synergies are rough estimates.</footer>

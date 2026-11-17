@@ -18,7 +18,7 @@ function Tags({ team }: { team: string[] }) {
   )
 }
 
-export function Results({ plan, busy }: { plan: Plan | null; busy: boolean }) {
+export function Results({ plan, busy, showWhy }: { plan: Plan | null; busy: boolean; showWhy: boolean }) {
   if (!plan || plan.kind === 'empty') return <p className="empty">Select at least 3 Resonators in step 1 to see teams here.</p>
   if (plan.kind === 'fix') return <p className="empty bad">Finish or fix your teams in step 2 to build the rest.</p>
   const { teams, leftover, manual, summary } = plan
@@ -44,7 +44,7 @@ export function Results({ plan, busy }: { plan: Plan | null; busy: boolean }) {
                 </div>
               )
             })}
-            <Tags team={t} />
+            {showWhy && <Tags team={t} />}
           </motion.article>
         ))}
       </div>
