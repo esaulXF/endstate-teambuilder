@@ -3,7 +3,7 @@
 // wuwalabo) for patch 3.8. Ratings are community consensus, not official data.
 // conf: 'high' = read from the kit page, 'med' = from team guides, 'low' = older/partial info.
 
-import { BY_NAME } from './characters'
+import { BY_NAME, isRover } from './characters'
 
 export type Eff =
   // Negative statuses (any of these satisfies a 'Negative Status' want)
@@ -100,8 +100,10 @@ export const PROFILES: Record<string, Profile> = {
   Qiuyuan: P('Echo Skill support', ['echo-skill'], ['Echo Skill DMG:3', 'Tune Break:1'], ['Energy'], 'high', 'Support'),
   Rebecca: P('Hack', ['hack'], ['Hack:3', 'All DMG Amp:3', 'Team ATK', 'Heavy Attack DMG'], ['Hack:2']),
   Roccia: P('Coordinated Attack', ['coordinated'], ['All DMG Amp'], ['Energy'], 'med'),
-  'Rover (Aero)': P('Aero Erosion', ['aero-erosion'], ['Aero Erosion', 'Healing', 'All DMG Amp:1'], ['Energy'], 'med', 'Support'),
-  'Rover (Electro)': P('Electro Flare', ['electro-flare'], ['Electro Flare:3', 'Team ATK', 'All DMG Amp'], ['Energy'], 'med'),
+  'Rover (Aero)': P('Aero Erosion', ['aero-erosion'], ['Aero Erosion', 'Healing:3', 'Team ATK:1', 'All DMG Amp:1'], ['Energy'], 'med', 'Support',
+    'The healer of the Rovers: heals the team and gives 15% ATK when healing. Cartethyia and Iuno teams use it as the healer.'),
+  'Rover (Electro)': P('Electro Flare', ['electro-flare'], ['Electro Flare:3', 'Team ATK', 'All DMG Amp'], ['Energy'], 'med', 'Main DPS',
+    'An Electro Sub-DPS, not a healer: it does not heal, so a team needs healing from someone else (Suisui, Buling, Shorekeeper).'),
   'Rover (Havoc)': P('Resonance Skill', ['starter'], ['RES Shred'], ['Energy'], 'med', 'Main DPS'),
   'Rover (Spectro)': P('Spectro Frazzle', ['frazzle'], ['Spectro Frazzle:3', 'RES Shred', 'Healing:1', 'Tune Break:1'], ['Spectro Frazzle:1'], 'med', 'Support'),
   Sanhua: P('Basic Attack support', ['basic-attack'], ['Basic Attack DMG:3', 'Team ATK:1'], ['Energy'], 'high', 'Support'),
@@ -210,6 +212,9 @@ export function bestBuild(team: string[]): { build: Build; exact: boolean } | nu
     // A partial match must include the build's main Resonator, so swapping the main for a different
     // character (e.g. Yangyang instead of Yangyang: Xuanling) never counts as that build.
     if (n < 2 || (n < 3 && !team.includes(b.team[0]))) continue
+    // Rover forms are four different Resonators (healer, Electro sub-DPS, Spectro, Havoc carry), so one form
+    // never stands in for another: Rover (Electro) is not a replacement for Rover (Aero).
+    if (n === 2 && b.team.some((m) => isRover(m) && !team.includes(m)) && team.some((m) => isRover(m) && !b.team.includes(m))) continue
     const v = TIER_POINTS[b.tier] * (n === 3 ? 1 : 0.3)
     if (!best || v > best.v) best = { build: b, exact: n === 3, v }
   }

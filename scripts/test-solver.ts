@@ -130,3 +130,8 @@ assert.ok(near.based!.lines.some((l) => /Changed: .* was replaced by Shorekeeper
 assert.ok(near.based!.lines.some((l) => /not in your roster/.test(l)), 'explains why the original Resonator is missing')
 assert.ok(explainTeam(['Hsin', 'Suoming', 'Lily'], { owned: [], teams: [], manual: [], index: 0 }).based === null, 'exact builds have no Based on')
 console.log('composition and explanation tests passed')
+
+// Rover forms are not interchangeable
+assert.equal(bestBuild2(['Iuno', 'Ciaccona', 'Rover (Electro)'])?.build.team.includes('Rover (Aero)') ?? false, false, 'Rover (Electro) must not count as Rover (Aero)')
+assert.equal(bestBuild2(['Iuno', 'Ciaccona', 'Rover (Aero)'])?.exact, true, 'the real Rover (Aero) team is still recognised')
+console.log('rover tests passed')
