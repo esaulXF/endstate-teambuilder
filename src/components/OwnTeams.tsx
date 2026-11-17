@@ -33,7 +33,7 @@ export function OwnTeams({ roster, teams, usesOf, onChange }: Props) {
             <motion.div key={ti} layout className="team-card" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.96 }}>
               <header className="team-head">
                 <h3>Your Team {ti + 1}</h3>
-                <button className="btn ghost small" onClick={() => onChange(teams.filter((_, i) => i !== ti))} aria-label={`Remove your team ${ti + 1}`}>Remove</button>
+                <button className="btn small" onClick={() => onChange(teams.filter((_, i) => i !== ti))} aria-label={`Remove your team ${ti + 1}`}>Remove</button>
               </header>
               {t.map((v, si) => (
                 <select key={si} className="field slot" aria-label={`Team ${ti + 1}, slot ${si + 1}`} value={v ?? ''} onChange={(e) => setSlot(ti, si, e.target.value || null)}>

@@ -37,7 +37,7 @@ export const ARCHETYPES: Record<ArchetypeId, { label: string; blurb: string }> =
   'skill-fusion': { label: 'Resonance Skill', blurb: 'Resonance Skill carries with skill amplifiers (Fusion and Spectro).' },
   liberation: { label: 'Liberation', blurb: 'Liberation burst damage with Liberation DMG amplifiers.' },
   'basic-attack': { label: 'Basic Attack', blurb: 'Basic Attack scalers with Basic Attack DMG amplifiers.' },
-  starter: { label: 'Early Game / F2P', blurb: 'Free or early-game Resonators with simple teams.' },
+  starter: { label: 'Early Game', blurb: 'Free or early-game Resonators with simple teams.' },
 }
 
 export interface Profile {
@@ -237,19 +237,13 @@ export function describeTeam(team: string[], roleOf: (n: string) => string): str
   // One label: the build type of the damage dealer that at least one teammate shares.
   // Double labels exist only on curated builds (BUILDS), where two members really run on two mechanics.
   const rank = (n: string) => (roleOf(n) === 'Main DPS' ? 0 : roleOf(n) === 'Sub-DPS' ? 1 : 2)
-  for (const carry of [...members].sort((a, b) => rank(a) - rank(b))) {
+  const carry = [...members].sort((a, b) => rank(a) - rank(b))[0]
+  if (carry) {
     const shared = PROFILES[carry].arch.filter((a) => a !== 'starter' && count(a) >= 2).sort((x, y) => count(y) - count(x))
     if (shared.length) return buildLabel(shared[0])
-    if (rank(carry) > 0) break
+    // The main damage dealer shares no build type with the team, so the team has no real build type.
+    if (bb) return buildLabel(bb.build.arch)
+    return members.every((n) => PROFILES[n].arch.every((a) => a === 'starter')) ? 'Early Game' : 'Mixed'
   }
-  const score = new Map<ArchetypeId, number>()
-  for (const n of members) {
-    const w = 2 - rank(n) * 0.5
-    PROFILES[n].arch.forEach((a, i) => score.set(a, (score.get(a) ?? 0) + w * (i ? 0.7 : 1)))
-  }
-  const ranked = [...score.entries()].filter(([a]) => a !== 'starter' && count(a) >= 2).sort((x, y) => y[1] - x[1])
-  if (ranked.length) return buildLabel(ranked[0][0])
-  if (members.every((n) => PROFILES[n].arch.every((a) => a === 'starter'))) return 'Early Game'
-  if (bb) return buildLabel(bb.build.arch)
   return 'Mixed'
 }

@@ -92,8 +92,8 @@ export function Roster({ roster, cycleBonus, onToggle, onSetMany }: Props) {
           <button key={x} className="chip" aria-pressed={role === x} onClick={() => setRole(role === x ? null : x)}>{x}</button>
         ))}
         <span className="spacer" />
-        <button className="btn ghost" onClick={() => onSetMany(shown.map((c) => c.name), true)}>Select Shown</button>
-        <button className="btn ghost" onClick={() => onSetMany(shown.map((c) => c.name), false)}>Clear Shown</button>
+        <button className="btn" onClick={() => onSetMany(shown.map((c) => c.name), true)}>Select Shown</button>
+        <button className="btn" onClick={() => onSetMany(shown.map((c) => c.name), false)}>Clear Shown</button>
       </div>
 
       {CATEGORIES.map((cat) => {

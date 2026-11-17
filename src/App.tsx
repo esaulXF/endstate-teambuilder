@@ -18,7 +18,7 @@ export default function App() {
   const [rosterList, setRosterList] = usePersistent<string[]>('wuwa-endstate-roster', [], (r) =>
     onlyOneRover(Array.isArray(r) ? r.filter((n) => typeof n === 'string' && n in BY_NAME) : []),
   )
-  const [alt, setAlt] = usePersistent<boolean>('wuwa-endstate-alt', false, (r) => r === true)
+  const [light, setLight] = usePersistent<boolean>('wuwa-endstate-light', false, (r) => r === true)
   const [why, setWhy] = usePersistent<boolean>('wuwa-endstate-why', false, (r) => r === true)
   const [cycle, setCycle] = usePersistent<boolean>('wuwa-endstate-cycle-v2', false)
   const [manual, setManual] = usePersistent<Slot[][]>('wuwa-endstate-manual-v2', [], (r) =>
@@ -28,9 +28,9 @@ export default function App() {
   const [busy, setBusy] = useState(false)
 
   useEffect(() => {
-    if (alt) document.documentElement.dataset.palette = 'alt'
-    else delete document.documentElement.dataset.palette
-  }, [alt])
+    if (light) document.documentElement.dataset.theme = 'light'
+    else delete document.documentElement.dataset.theme
+  }, [light])
 
   const roster = useMemo(() => new Set(rosterList), [rosterList])
   const usesOf = (n: string) => usesFor(n, cycle)
@@ -68,8 +68,8 @@ export default function App() {
     <div className="shell">
       <div className="topbar">
         <label className="switch">
-          <input type="checkbox" checked={alt} onChange={(e) => setAlt(e.target.checked)} />
-          <span>Alt Color</span>
+          <input type="checkbox" checked={light} onChange={(e) => setLight(e.target.checked)} />
+          <span>Light Mode</span>
         </label>
       </div>
       <header className="hero">
@@ -100,7 +100,7 @@ export default function App() {
       <section className="panel" aria-labelledby="s3">
         <h2 id="s3"><span className="step">3</span>Build the Rest</h2>
         <div className="build-bar">
-          <button className="btn primary" onClick={build} disabled={busy || rosterList.length < 3}>{busy ? 'Building…' : 'Build Teams'}</button>
+          <button className="btn" onClick={build} disabled={busy || rosterList.length < 3}>{busy ? 'Building…' : 'Build Teams'}</button>
           <label className="switch why-switch">
             <input type="checkbox" checked={why} onChange={(e) => setWhy(e.target.checked)} />
             <span>Show Team Reasoning</span>

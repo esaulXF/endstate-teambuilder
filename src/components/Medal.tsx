@@ -1,7 +1,7 @@
 import type { Resonator } from '../data/characters'
 
 export const ELEMENT_COLOR: Record<string, string> = {
-  Fusion: '#ff7a45', Glacio: '#55c3f2', Aero: '#3fe0a5', Electro: '#b58cff', Spectro: '#f1d36b', Havoc: '#f0508f',
+  Fusion: 'var(--el-fusion)', Glacio: 'var(--el-glacio)', Aero: 'var(--el-aero)', Electro: 'var(--el-electro)', Spectro: 'var(--el-spectro)', Havoc: 'var(--el-havoc)',
 }
 
 // Portraits are optional: drop files named like the Resonator (e.g. shorekeeper.webp,
