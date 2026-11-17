@@ -26,6 +26,7 @@ function check(cycle: boolean, used: string[] = []) {
   teams.forEach((t) => {
     assert.equal(t.length, 3, 'team not full')
     assert.equal(new Set(t).size, 3, 'duplicate inside a team')
+    assert.ok(t.filter((n) => BY_NAME[n].role === 'Support').length <= 1, `two Supports in ${t.join(', ')}`)
     t.forEach((n) => (use[n] = (use[n] || 0) + 1))
   })
   for (const [n, k] of Object.entries(use)) assert.ok(k <= caps[n], `${n} used ${k} > cap ${caps[n]}`)
@@ -100,3 +101,13 @@ assert.equal(describeTeam(['Hiyuki', 'Lucilla', 'Chisa'], role), 'Glacio Chafe')
 assert.equal(describeTeam(['Hsin', 'Suoming', 'Lily'], role), 'Unison')
 assert.equal(describeTeam(['Sigrika', 'Lucilla', 'Lily'], role), 'Echo Skill')
 console.log('double label tests passed')
+
+// Best team first, no double Supports
+const caps1 = (r: string[]) => Object.fromEntries(r.map((n) => [n, usesFor(n, false)]))
+const run = (r: string[]) => solve(r, caps1(r), maxTeams(caps1(r)))
+const r1 = run(['Hsin', 'Lily', 'Jinhsi', 'Aalto', 'Lumi', 'Shorekeeper', 'Aemeath', 'Lynae', 'Mornye'])
+assert.ok(r1.some((t) => t.includes('Hsin') && t.includes('Lily') && t.includes('Jinhsi')), 'Hsin and Lily should get Jinhsi, not Aalto or Lumi')
+const r2 = run(['Hsin', 'Suoming', 'Lily', 'Lingyang', 'Danjin', 'Youhu'])
+assert.deepEqual([...r2[0]].sort(), ['Hsin', 'Lily', 'Suoming'], 'the best team is built first and the leftovers form the weak team')
+assert.equal(run(['Hsin', 'Lily', 'Lumi']).length, 0, 'two Supports never share a team')
+console.log('best-first tests passed')

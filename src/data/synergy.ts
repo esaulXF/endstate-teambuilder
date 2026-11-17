@@ -128,6 +128,7 @@ const YX = 'Yangyang: Xuanling', RE = 'Rover (Electro)', RA = 'Rover (Aero)', RS
 
 export const BUILDS: Build[] = [
   ...B('T0', 'unison', 'Hsin/Suoming/Lily'),
+  ...B('T0.5', 'unison', 'Hsin/Jinhsi/Lily'),
   ...B('T0', 'havoc-bane', `${YX}/Chisa/Suisui`),
   ...B('T0', 'tune-break', 'Qingxiao/Denia/Mornye'),
   ...B('T0', 'heavy-shield', 'Jingran/Iuno/Shorekeeper'),

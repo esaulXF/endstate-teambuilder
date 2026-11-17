@@ -43,15 +43,6 @@ export function countUsage(teams: (string | null)[][]): Record<string, number> {
   return u
 }
 
-function rng(seed: number) {
-  return () => {
-    seed |= 0; seed = (seed + 0x6d2b79f5) | 0
-    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed)
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
-  }
-}
-
 const ROLE_ORDER = { 'Main DPS': 0, 'Sub-DPS': 1, Support: 2 } as const
 
 /** Display order inside a team: Main DPS first, then Sub-DPS, then Support (higher power first on ties). */
@@ -59,85 +50,69 @@ export function orderTeam(team: Team): Team {
   return team.sort((a, b) => ROLE_ORDER[BY_NAME[a].role] - ROLE_ORDER[BY_NAME[b].role] || BY_NAME[b].power - BY_NAME[a].power || a.localeCompare(b))
 }
 
-/** Number of full teams the pool can fill given each Resonator's remaining uses. */
+const isSupport = (n: string) => BY_NAME[n].role === 'Support'
+
+/**
+ * Can `k` full teams still be built from these remaining uses? A Resonator fills at most one slot per
+ * team, and a team never holds two Supports, so Supports can fill at most one slot per team in total.
+ */
+function feasible(caps: Record<string, number>, k: number): boolean {
+  if (k <= 0) return true
+  let sup = 0, rest = 0
+  for (const [n, c] of Object.entries(caps)) {
+    if (c <= 0) continue
+    if (isSupport(n)) sup += Math.min(c, k)
+    else rest += Math.min(c, k)
+  }
+  return Math.min(sup, k) + rest >= 3 * k
+}
+
+/** Number of full teams the uses can fill (no team has two Supports). */
 export function maxTeams(caps: Record<string, number>): number {
-  return Math.min(24, Math.floor(Object.values(caps).reduce((a, b) => a + b, 0) / 3))
+  let k = Math.min(24, Math.floor(Object.values(caps).reduce((a, b) => a + Math.max(b, 0), 0) / 3))
+  while (k > 0 && !feasible(caps, k)) k--
+  return k
 }
 
 /**
- * Builds `count` teams of up to 3 from the pool. caps[name] = remaining uses.
- * Deterministic for the same input. Never uses a Resonator more than its cap
- * or twice in one team.
+ * Builds up to `count` full teams. caps[name] = remaining uses.
+ * Best team first: the highest-scoring team the pool can form is locked in, then the next best from
+ * what is left, and so on, so the leftovers end up in the weakest teams (one strong and one weak team
+ * beats two middling ones). A pick is only allowed if the remaining uses can still fill the other teams.
+ * Never uses a Resonator more often than its cap, twice in one team, or with a second Support.
+ * Deterministic for the same input.
  */
 export function solve(pool: string[], caps: Record<string, number>, count: number): Team[] {
-  if (!count) return []
-  const R = rng(7)
-  const slots = count * 3
-  const valid = (sl: (string | null)[]) => {
-    const used: Record<string, number> = {}
-    for (let t = 0; t < count; t++) {
-      const seg = sl.slice(t * 3, t * 3 + 3)
-      for (let j = 0; j < 3; j++) {
-        const v = seg[j]
-        if (!v) continue
-        if (seg.indexOf(v) !== j) return false
-        used[v] = (used[v] || 0) + 1
-        if (used[v] > (caps[v] ?? 0)) return false
+  const left: Record<string, number> = {}
+  pool.forEach((n) => (left[n] = caps[n] ?? 0))
+  const names = pool.filter((n) => left[n] > 0).sort()
+  let k = count
+  while (k > 0 && !feasible(left, k)) k--
+  if (!k) return []
+
+  // Every legal trio, best first.
+  const trios: { t: Team; s: number }[] = []
+  for (let i = 0; i < names.length; i++)
+    for (let j = i + 1; j < names.length; j++)
+      for (let l = j + 1; l < names.length; l++) {
+        const t = [names[i], names[j], names[l]]
+        if (t.filter(isSupport).length > 1) continue
+        trios.push({ t, s: scoreTeam(t) })
       }
-    }
-    return true
-  }
-  const total = (sl: (string | null)[]) => {
-    let s = 0
-    for (let t = 0; t < count; t++) s += scoreTeam(sl.slice(t * 3, t * 3 + 3).filter((n): n is string => !!n))
-    return s
-  }
-  let best: (string | null)[] = Array(slots).fill(null)
-  let bestScore = -Infinity
-  const rounds = count > 8 ? 4 : 8
-  for (let r = 0; r < rounds; r++) {
-    const sl: (string | null)[] = Array(slots).fill(null)
-    pool.map((n) => [n, BY_NAME[n].power + R() * 4] as const).sort((a, b) => b[1] - a[1]).forEach(([n]) => {
-      const order = [...Array(count).keys()].sort(() => R() - 0.5)
-      for (const t of order) {
-        const seg = sl.slice(t * 3, t * 3 + 3)
-        if (seg.includes(n)) continue
-        const k = seg.indexOf(null)
-        if (k < 0) continue
-        sl[t * 3 + k] = n
-        if (!valid(sl)) { sl[t * 3 + k] = null; continue }
-        break
-      }
-    })
-    // Fill any hole left by the greedy pass with a Resonator that still has uses left.
-    const left = (n: string) => (caps[n] ?? 0) - sl.filter((x) => x === n).length
-    for (let i = 0; i < slots; i++) {
-      if (sl[i]) continue
-      const seg = Math.floor(i / 3) * 3
-      const cand = pool.filter((n) => left(n) > 0 && !sl.slice(seg, seg + 3).includes(n)).sort((a, b) => BY_NAME[b].power - BY_NAME[a].power)[0]
-      if (cand) sl[i] = cand
-    }
-    let cur = total(sl)
-    for (let it = 0; it < 4000; it++) {
-      const a = Math.floor(R() * slots), pa = sl[a]
-      let b = -1, pb: string | null = null
-      if (R() < 0.5) {
-        b = Math.floor(R() * slots); pb = sl[b]
-        if (a === b) continue
-        sl[a] = pb; sl[b] = pa
-      } else {
-        sl[a] = pool[Math.floor(R() * pool.length)]
-      }
-      if (valid(sl)) { const s = total(sl); if (s >= cur) { cur = s; continue } }
-      sl[a] = pa
-      if (b >= 0) sl[b] = pb
-    }
-    if (cur > bestScore) { bestScore = cur; best = sl.slice() }
-  }
+  trios.sort((x, y) => y.s - x.s)
+
   const teams: Team[] = []
-  for (let t = 0; t < count; t++) {
-    const seg = best.slice(t * 3, t * 3 + 3).filter((n): n is string => !!n)
-    if (seg.length) teams.push(seg)
+  for (let n = 0; n < k; n++) {
+    const pick = trios.find(({ t }) => {
+      if (t.some((m) => left[m] < 1)) return false
+      t.forEach((m) => left[m]--)
+      const ok = feasible(left, k - n - 1)
+      t.forEach((m) => left[m]++)
+      return ok
+    })
+    if (!pick) break
+    pick.t.forEach((m) => left[m]--)
+    teams.push([...pick.t])
   }
   teams.forEach(orderTeam)
   return teams.sort((a, b) => scoreTeam(b) - scoreTeam(a))
