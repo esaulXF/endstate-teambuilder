@@ -127,12 +127,11 @@ const B = (tier: Tier, arch: ArchetypeId | ArchetypeId[], ...teams: string[]): B
 const YX = 'Yangyang: Xuanling', RE = 'Rover (Electro)', RA = 'Rover (Aero)', RS = 'Rover (Spectro)', RH = 'Rover (Havoc)', LH = 'Luuk Herssen', XY = 'Xiangli Yao'
 
 export const BUILDS: Build[] = [
-  ...B('T0', ['unison', 'echo-skill'], 'Hsin/Suoming/Lily'),
+  ...B('T0', 'unison', 'Hsin/Suoming/Lily'),
   ...B('T0', 'havoc-bane', `${YX}/Chisa/Suisui`),
   ...B('T0', 'tune-break', 'Qingxiao/Denia/Mornye'),
   ...B('T0', 'heavy-shield', 'Jingran/Iuno/Shorekeeper'),
-  ...B('T0.5', ['glacio-chafe', 'havoc-bane'], 'Hiyuki/Lucilla/Chisa'),
-  ...B('T0.5', 'glacio-chafe', 'Hiyuki/Lucilla/Suisui'),
+  ...B('T0.5', 'glacio-chafe', 'Hiyuki/Lucilla/Chisa', 'Hiyuki/Lucilla/Suisui'),
   ...B('T0.5', 'tune-break', 'Aemeath/Lynae/Mornye', 'Aemeath/Denia/Chisa', `${LH}/Denia/Mornye`),
   ...B('T0.5', 'echo-skill', 'Sigrika/Qiuyuan/Lily'),
   ...B('T0.5', 'electro-flare', `Hsin/${RE}/Buling`, `Hsin/${RE}/Suisui`),
@@ -233,19 +232,23 @@ export const buildLabel = (arch: ArchetypeId | ArchetypeId[]) => (Array.isArray(
 export function describeTeam(team: string[], roleOf: (n: string) => string): string {
   const bb = bestBuild(team)
   if (bb?.exact) return buildLabel(bb.build.arch)
-  const score = new Map<ArchetypeId, number>()
   const members = team.filter((n) => PROFILES[n])
+  const count = (a: ArchetypeId) => members.filter((n) => PROFILES[n].arch.includes(a)).length
+  // One label: the build type of the damage dealer that at least one teammate shares.
+  // Double labels exist only on curated builds (BUILDS), where two members really run on two mechanics.
+  const rank = (n: string) => (roleOf(n) === 'Main DPS' ? 0 : roleOf(n) === 'Sub-DPS' ? 1 : 2)
+  for (const carry of [...members].sort((a, b) => rank(a) - rank(b))) {
+    const shared = PROFILES[carry].arch.filter((a) => a !== 'starter' && count(a) >= 2).sort((x, y) => count(y) - count(x))
+    if (shared.length) return buildLabel(shared[0])
+    if (rank(carry) > 0) break
+  }
+  const score = new Map<ArchetypeId, number>()
   for (const n of members) {
-    const w = roleOf(n) === 'Main DPS' ? 2 : roleOf(n) === 'Sub-DPS' ? 1.5 : 1
+    const w = 2 - rank(n) * 0.5
     PROFILES[n].arch.forEach((a, i) => score.set(a, (score.get(a) ?? 0) + w * (i ? 0.7 : 1)))
   }
-  const count = (a: ArchetypeId) => members.filter((n) => PROFILES[n].arch.includes(a)).length
   const ranked = [...score.entries()].filter(([a]) => a !== 'starter' && count(a) >= 2).sort((x, y) => y[1] - x[1])
-  if (ranked.length) {
-    // Two strong build types in one team get a double label.
-    const second = ranked[1] && ranked[1][1] >= ranked[0][1] * 0.75 ? ranked[1][0] : null
-    return buildLabel(second ? [ranked[0][0], second] : ranked[0][0])
-  }
+  if (ranked.length) return buildLabel(ranked[0][0])
   if (members.every((n) => PROFILES[n].arch.every((a) => a === 'starter'))) return 'Early game'
   if (bb) return buildLabel(bb.build.arch)
   return 'Mixed'

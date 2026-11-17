@@ -96,5 +96,7 @@ assert.equal(bestBuild(['Yangyang', 'Chisa', 'Suisui'])?.build.team.includes('Ya
 assert.notEqual(describeTeam(['Yangyang', 'Chisa', 'Suisui'], role), 'Havoc Bane' + '!')
 console.log('descriptor tests passed')
 assert.equal(describeTeam(['Phrolova', 'Cantarella', 'Shorekeeper'], role), 'Echo Skill / Coordinated Attack')
-assert.equal(describeTeam(['Hiyuki', 'Lucilla', 'Chisa'], role), 'Glacio Chafe / Havoc Bane')
+assert.equal(describeTeam(['Hiyuki', 'Lucilla', 'Chisa'], role), 'Glacio Chafe')
+assert.equal(describeTeam(['Hsin', 'Suoming', 'Lily'], role), 'Unison')
+assert.equal(describeTeam(['Sigrika', 'Lucilla', 'Lily'], role), 'Echo Skill')
 console.log('double label tests passed')
