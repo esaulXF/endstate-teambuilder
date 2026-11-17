@@ -3,12 +3,14 @@
 // wuwalabo) for patch 3.8. Ratings are community consensus, not official data.
 // conf: 'high' = read from the kit page, 'med' = from team guides, 'low' = older/partial info.
 
+import { BY_NAME } from './characters'
+
 export type Eff =
   // Negative statuses (any of these satisfies a 'Negative Status' want)
   | 'Havoc Bane' | 'Glacio Chafe' | 'Fusion Burst' | 'Electro Flare' | 'Aero Erosion' | 'Spectro Frazzle'
   | 'Negative Status'
   // Mechanics
-  | 'Tune Break' | 'Hack' | 'Unison' | 'Coordinated Attack' | 'Shield'
+  | 'Tune Break' | 'Interfered' | 'Hack' | 'Unison' | 'Coordinated Attack' | 'Shield'
   // Damage-type amplifiers (given by one Resonator, wanted by whoever deals that damage)
   | 'Echo Skill DMG' | 'Heavy Attack DMG' | 'Basic Attack DMG' | 'Skill DMG' | 'Liberation DMG'
   // General support
@@ -18,7 +20,7 @@ type Weighted = Eff | `${Eff}:${1 | 2 | 3}` // strength 1 minor, 2 normal (defau
 
 export type ArchetypeId =
   | 'havoc-bane' | 'tune-break' | 'unison' | 'echo-skill' | 'heavy-shield' | 'glacio-chafe' | 'aero-erosion'
-  | 'frazzle' | 'electro-flare' | 'hack' | 'coordinated' | 'skill-fusion' | 'liberation' | 'basic-attack' | 'starter'
+  | 'frazzle' | 'electro-flare' | 'hack' | 'coordinated' | 'skill-fusion' | 'fusion' | 'liberation' | 'basic-attack' | 'starter'
 
 export const NEGATIVE_STATUSES: Eff[] = ['Havoc Bane', 'Glacio Chafe', 'Fusion Burst', 'Electro Flare', 'Aero Erosion', 'Spectro Frazzle']
 
@@ -34,6 +36,7 @@ export const ARCHETYPES: Record<ArchetypeId, { label: string; blurb: string }> =
   'electro-flare': { label: 'Electro Flare', blurb: 'Electro Flare stacks from Rover (Electro), Buling and Hsin.' },
   hack: { label: 'Hack', blurb: 'Hack - Shifting/Interfered from Rebecca and Lucy.' },
   coordinated: { label: 'Coordinated Attack', blurb: 'Off-field Coordinated Attack damage (Phrolova, Cantarella, Yinlin).' },
+  fusion: { label: 'Fusion Team', blurb: 'Lupa with Fusion teammates: every other Fusion Resonator raises her Fusion RES ignore, and a full Fusion team unlocks Pack Hunt.' },
   'skill-fusion': { label: 'Resonance Skill', blurb: 'Resonance Skill carries with skill amplifiers (Fusion and Spectro).' },
   liberation: { label: 'Liberation', blurb: 'Liberation burst damage with Liberation DMG amplifiers.' },
   'basic-attack': { label: 'Basic Attack', blurb: 'Basic Attack scalers with Basic Attack DMG amplifiers.' },
@@ -53,7 +56,7 @@ export interface Profile {
 const P = (style: string, arch: ArchetypeId[], applies: Weighted[], wants: Weighted[], conf: Profile['conf'] = 'high', alt?: Profile['alt'], note?: string): Profile => ({ style, arch, applies, wants, conf, alt, note })
 
 export const PROFILES: Record<string, Profile> = {
-  Aemeath: P('Liberation', ['tune-break'], ['Tune Break', 'Fusion Burst'], ['Tune Break:3', 'Liberation DMG']),
+  Aemeath: P('Liberation', ['tune-break'], ['Tune Break', 'Fusion Burst'], ['Tune Break:3', 'Interfered:2', 'Liberation DMG']),
   Aalto: P('Basic Attack', ['starter'], [], ['Basic Attack DMG'], 'low'),
   Augusta: P('Heavy Attack', ['heavy-shield'], ['Team ATK:1', 'Shield:1'], ['Heavy Attack DMG:3', 'Shield']),
   Baizhi: P('Healing', ['starter'], ['Healing:3', 'Team ATK'], ['Energy'], 'med'),
@@ -78,17 +81,18 @@ export const PROFILES: Record<string, Profile> = {
   Iuno: P('Shield support', ['heavy-shield'], ['Shield:3', 'All DMG Amp:3', 'Heavy Attack DMG:3'], ['Energy:1'], 'high', 'Support'),
   Jianxin: P('Healing', ['starter'], ['Healing'], ['Energy'], 'low'),
   Jingran: P('Heavy Attack', ['heavy-shield'], ['Shield', 'Team ATK'], ['Shield:3', 'Heavy Attack DMG:2', 'Healing:1']),
-  Jinhsi: P('Resonance Skill', ['skill-fusion'], [], ['Skill DMG:2'], 'med'),
+  Jinhsi: P('Resonance Skill', ['skill-fusion', 'unison'], [], ['Skill DMG:2', 'Unison:2', 'Coordinated Attack:1'], 'med'),
   Jiyan: P('Heavy Attack', ['heavy-shield'], ['Heavy Attack DMG'], ['Heavy Attack DMG:3'], 'med'),
   Lily: P('Echo Skill support', ['unison', 'echo-skill'], ['Unison:3', 'Echo Skill DMG:3', 'Tune Break', 'All DMG Amp:3', 'Team ATK', 'Healing'], ['Unison'], 'high', 'Sub-DPS'),
   Lingyang: P('Basic Attack', ['starter'], [], ['Basic Attack DMG'], 'low'),
   Lucilla: P('Glacio Chafe', ['glacio-chafe', 'echo-skill'], ['Glacio Chafe:3', 'Team ATK:3'], ['Echo Skill DMG:1']),
   Lucy: P('Heavy Attack', ['hack'], ['Hack'], ['Hack:3', 'Heavy Attack DMG:2']),
   Lumi: P('Healing', ['starter'], ['Electro Flare:1', 'Healing:1'], ['Energy'], 'low'),
-  Lupa: P('Liberation', ['skill-fusion'], ['RES Shred', 'All DMG Amp'], ['Liberation DMG:1'], 'med'),
+  Lupa: P('Liberation', ['fusion'], ['RES Shred:3', 'All DMG Amp'], ['Liberation DMG:1'], 'med', undefined,
+    'Her Resonance Liberation ignores more Fusion RES for each other Fusion Resonator on the team, and Pack Hunt needs all 3 to be Fusion.'),
   'Luuk Herssen': P('Basic Attack', ['tune-break', 'basic-attack'], ['Tune Break:1'], ['Tune Break:3', 'Basic Attack DMG:2']),
-  Lynae: P('Tune Break', ['tune-break'], ['Tune Break:3', 'All DMG Amp:3', 'Liberation DMG'], ['Tune Break:2']),
-  Mornye: P('Tune Break support', ['tune-break'], ['Tune Break:3', 'All DMG Amp:3', 'Healing:3'], ['Tune Break:2']),
+  Lynae: P('Tune Break', ['tune-break'], ['Tune Break:3', 'Interfered:3', 'All DMG Amp:3', 'Liberation DMG'], ['Tune Break:2']),
+  Mornye: P('Tune Break support', ['tune-break'], ['Tune Break:3', 'All DMG Amp:3', 'Healing:3'], ['Tune Break:2', 'Interfered:3']),
   Mortefi: P('Heavy Attack', ['starter'], ['Heavy Attack DMG'], ['Energy'], 'low'),
   Phoebe: P('Spectro Frazzle', ['frazzle'], ['Spectro Frazzle:3'], ['Spectro Frazzle:2'], 'med', 'Main DPS'),
   Phrolova: P('Echo Skill', ['echo-skill', 'coordinated'], ['Team ATK'], ['Echo Skill DMG:3', 'Coordinated Attack']),
@@ -141,11 +145,12 @@ export const BUILDS: Build[] = [
   ...B('T1', 'heavy-shield', 'Augusta/Iuno/Shorekeeper', 'Augusta/Rebecca/Shorekeeper', 'Jingran/Lupa/Mornye', 'Jingran/Lynae/Mornye', 'Iuno/Yinlin/Shorekeeper'),
   ...B('T1', 'tune-break', 'Qingxiao/Lynae/Mornye', 'Qingxiao/Sanhua/Mornye', 'Qingxiao/Denia/Ciaccona', `${LH}/Lynae/Mornye`, 'Suoming/Lynae/Mornye', 'Aemeath/Lupa/Mornye', 'Galbrena/Denia/Lupa'),
   ...B('T1', 'havoc-bane', `${YX}/Rebecca/Chisa`, `${YX}/Rebecca/Suisui`, `${YX}/Lynae/Mornye`, `${YX}/Phrolova/Shorekeeper`, `${YX}/Chisa/Shorekeeper`, 'Hiyuki/Lynae/Chisa', 'Hiyuki/Chisa/Shorekeeper', 'Hiyuki/Lynae/Mornye', `Hsin/${RE}/Chisa`),
+  ...B('T1', 'fusion', 'Galbrena/Lupa/Brant', 'Changli/Lupa/Brant', 'Brant/Lupa/Mornye', 'Changli/Lupa/Mornye', 'Brant/Lupa/Shorekeeper'),
   ...B('T1', 'unison', 'Hsin/Suoming/Shorekeeper', 'Hsin/Suoming/Verina', 'Hsin/Jinhsi/Shorekeeper'),
   ...B('T1', 'hack', 'Lucy/Rebecca/Mornye', 'Lucy/Rebecca/Shorekeeper'),
   ...B('T2', 'aero-erosion', 'Cartethyia/Ciaccona/Chisa', `Cartethyia/Ciaccona/${RA}`, 'Cartethyia/Sanhua/Shorekeeper', `Jiyan/Iuno/Ciaccona`),
   ...B('T2', 'frazzle', `Zani/Phoebe/${RS}`, 'Zani/Phoebe/Shorekeeper', `Zani/${RS}/Baizhi`, `Phoebe/${RS}/Chisa`),
-  ...B('T2', 'skill-fusion', 'Jinhsi/Zhezhi/Verina', 'Jinhsi/Yuanwu/Verina', 'Galbrena/Lupa/Brant', 'Changli/Lupa/Brant', 'Carlotta/Lynae/Mornye'),
+  ...B('T2', 'skill-fusion', 'Jinhsi/Zhezhi/Verina', 'Jinhsi/Yuanwu/Verina', 'Carlotta/Lynae/Mornye'),
   ...B('T2', 'havoc-bane', `${YX}/Mortefi/Chisa`),
   ...B('T2', ['echo-skill', 'coordinated'], 'Phrolova/Roccia/Cantarella', 'Phrolova/Danjin/Buling'),
   ...B('T2', 'coordinated', 'Sanhua/Cantarella/Shorekeeper'),
@@ -213,6 +218,24 @@ export function bestBuild(team: string[]): { build: Build; exact: boolean } | nu
 
 /** Synergy points for a team (linked effects, capped, plus the best matching known build). */
 export function synergyScore(team: string[], isDps: (n: string) => boolean): number {
+  return linkAndBuildScore(team, isDps) + compositionRules(team).reduce((a, r) => a + r.points, 0)
+}
+
+export interface CompRule { who: string; points: number; text: string }
+
+/** Effects that depend on WHO is on the team (not on what a teammate applies). Base kit only, no Resonance Chains. */
+export function compositionRules(team: string[]): CompRule[] {
+  const out: CompRule[] = []
+  if (team.includes('Lupa')) {
+    const fusion = team.filter((n) => n !== 'Lupa' && BY_NAME[n]?.element === 'Fusion')
+    if (fusion.length === 2) out.push({ who: 'Lupa', points: 6, text: `Lupa is on a full Fusion team (${fusion.join(' and ')}): her Fusion RES ignore is at its highest and Pack Hunt (extra Fusion DMG against Overlord and Calamity Class targets) is unlocked.` })
+    else if (fusion.length === 1) out.push({ who: 'Lupa', points: 2, text: `Lupa has one other Fusion teammate (${fusion[0]}), so she ignores some extra Fusion RES, but Pack Hunt stays locked without a third Fusion Resonator.` })
+    else out.push({ who: 'Lupa', points: 0, text: 'Lupa has no other Fusion teammate, so she gets no extra Fusion RES ignore and Pack Hunt stays locked.' })
+  }
+  return out
+}
+
+function linkAndBuildScore(team: string[], isDps: (n: string) => boolean): number {
   const links = teamLinks(team, isDps)
   // Each effect type from each provider counts once so one buff cannot be farmed several times.
   const seen = new Set<string>()

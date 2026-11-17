@@ -231,6 +231,10 @@ select.field { cursor: pointer; }
 .tag { font-size: 12px; padding: 3px 8px; color: var(--dim); border: 1px solid var(--edge); clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%); }
 .tag.tier-T0, .tag.tier-T05 { color: var(--hl); border-color: var(--sec); }
 
+.why-list { margin: 8px 0 0; padding-left: 18px; font-size: 13px; line-height: 1.5; color: var(--dim); }
+.why-list li + li { margin-top: 4px; }
+.why-list.based { padding: 6px 10px 6px 26px; border-left: 3px solid var(--sec); background: oklch(var(--abyss-c) / 0.4); color: inherit; }
+
 .build-bar { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 20px; margin-bottom: 14px; }
 .build-bar .switch { margin-top: 0; }
 .hint.stale { color: var(--hl); margin: 0 0 10px; }

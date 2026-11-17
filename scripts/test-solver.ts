@@ -111,3 +111,22 @@ const r2 = run(['Hsin', 'Suoming', 'Lily', 'Lingyang', 'Danjin', 'Youhu'])
 assert.deepEqual([...r2[0]].sort(), ['Hsin', 'Lily', 'Suoming'], 'the best team is built first and the leftovers form the weak team')
 assert.equal(run(['Hsin', 'Lily', 'Lumi']).length, 0, 'two Supports never share a team')
 console.log('best-first tests passed')
+
+// ---- composition rules and explanations ----
+import { compositionRules, bestBuild as bestBuild2, synergyScore } from '../src/data/synergy'
+import { explainTeam } from '../src/data/explain'
+const dpsOf = (n: string) => BY_NAME[n].role !== 'Support'
+assert.equal(compositionRules(['Brant', 'Lupa', 'Changli'])[0].points, 6, 'full Fusion team boosts Lupa')
+assert.equal(compositionRules(['Brant', 'Lupa', 'Shorekeeper'])[0].points, 2, 'one Fusion teammate gives a small boost')
+assert.equal(compositionRules(['Lupa', 'Shorekeeper', 'Verina'])[0].points, 0, 'no Fusion teammate gives nothing')
+assert.equal(compositionRules(['Hsin', 'Lily', 'Suoming']).length, 0, 'rules only apply to Lupa')
+assert.ok(synergyScore(['Brant', 'Lupa', 'Changli'], dpsOf) > synergyScore(['Lupa', 'Shorekeeper', 'Verina'], dpsOf), 'Lupa prefers Fusion teammates')
+assert.equal(bestBuild2(['Brant', 'Lupa', 'Mornye'])?.exact, true, 'Brant/Lupa/Mornye is a known build')
+assert.equal(bestBuild2(['Changli', 'Lupa', 'Mornye'])?.exact, true)
+assert.equal(bestBuild2(['Brant', 'Lupa', 'Shorekeeper'])?.exact, true)
+const near = explainTeam(['Hsin', 'Lily', 'Shorekeeper'], { owned: ['Hsin', 'Lily', 'Shorekeeper'], teams: [['Hsin', 'Lily', 'Shorekeeper']], manual: [], index: 0 })
+assert.ok(near.based && /^Based on /.test(near.based.tag) && !/close/i.test(near.based.tag), 'near matches are labelled Based on')
+assert.ok(near.based!.lines.some((l) => /Changed: .* was replaced by Shorekeeper/.test(l)), 'explains which Resonator was replaced')
+assert.ok(near.based!.lines.some((l) => /not in your roster/.test(l)), 'explains why the original Resonator is missing')
+assert.ok(explainTeam(['Hsin', 'Suoming', 'Lily'], { owned: [], teams: [], manual: [], index: 0 }).based === null, 'exact builds have no Based on')
+console.log('composition and explanation tests passed')

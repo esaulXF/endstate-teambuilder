@@ -109,7 +109,7 @@ export default function App() {
             <span>Show Team Reasoning</span>
           </label>
         </div>
-        <Results plan={built?.plan ?? null} busy={busy} stale={stale} showWhy={why} />
+        <Results plan={built?.plan ?? null} busy={busy} stale={stale} showWhy={why} roster={rosterList} />
       </section>
 
       <footer className="foot">Unofficial fan tool, not affiliated with Kuro Games. Ratings and synergies are rough estimates.</footer>

@@ -2,23 +2,24 @@ import { motion } from 'framer-motion'
 import { BY_NAME } from '../data/characters'
 import { ELEMENT_COLOR, Medal, Stars } from './Medal'
 import type { Plan } from '../lib/plan'
-import { bestBuild, buildLabel, describeTeam, teamLinks } from '../data/synergy'
+import { bestBuild, buildLabel, describeTeam } from '../data/synergy'
+import { explainTeam } from '../data/explain'
 
 const isDps = (n: string) => BY_NAME[n].role !== 'Support'
 
-function Tags({ team }: { team: string[] }) {
+function Why({ team, ctx }: { team: string[]; ctx: Parameters<typeof explainTeam>[1] }) {
   const bb = bestBuild(team)
-  const links = teamLinks(team, isDps).filter((l, i, a) => a.findIndex((x) => x.from === l.from && x.effect === l.effect) === i).slice(0, 2)
-  if (!bb && !links.length) return null
+  const ex = explainTeam(team, ctx)
   return (
-    <div className="tags">
-      {bb && <span className={`tag tier-${bb.build.tier.replace('.', '')}`} title={bb.exact ? 'Known build' : 'Close to a known build'}>{bb.build.tier} {buildLabel(bb.build.arch)}{bb.exact ? '' : ' (close)'}</span>}
-      {links.map((l) => <span key={l.from + l.to + l.effect} className="tag">{l.from} gives {l.to} {l.effect}</span>)}
+    <div className="why">
+      {bb && <div className="tags"><span className={`tag tier-${bb.build.tier.replace('.', '')}`}>{ex.based ? ex.based.tag : `${bb.build.tier} ${buildLabel(bb.build.arch)}`}</span></div>}
+      {ex.based && <ul className="why-list based">{ex.based.lines.map((l, i) => <li key={i}>{l}</li>)}</ul>}
+      <ul className="why-list">{ex.lines.map((l, i) => <li key={i}>{l}</li>)}</ul>
     </div>
   )
 }
 
-export function Results({ plan, busy, stale, showWhy }: { plan: Plan | null; busy: boolean; stale: boolean; showWhy: boolean }) {
+export function Results({ plan, busy, stale, showWhy, roster }: { plan: Plan | null; busy: boolean; stale: boolean; showWhy: boolean; roster: string[] }) {
   if (!plan) return <p className="empty">Press Build Teams to see your teams here.</p>
   if (plan.kind === 'empty') return <p className="empty">Select at least 3 Resonators in step 1 to see teams here.</p>
   if (plan.kind === 'fix') return <p className="empty bad">Finish or fix your teams in step 2 to build the rest.</p>
@@ -46,7 +47,7 @@ export function Results({ plan, busy, stale, showWhy }: { plan: Plan | null; bus
                 </div>
               )
             })}
-            {showWhy && <Tags team={t} />}
+            {showWhy && <Why team={t} ctx={{ owned: roster, teams, manual, index: i }} />}
           </motion.article>
         ))}
       </div>
