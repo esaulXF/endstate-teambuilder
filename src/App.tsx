@@ -23,7 +23,7 @@ export default function App() {
   const [manual, setManual] = usePersistent<Slot[][]>('wuwa-endstate-manual-v2', [], (r) =>
     Array.isArray(r) ? r.map((t) => (Array.isArray(t) ? t.slice(0, 3).map((n) => (typeof n === 'string' && n in BY_NAME ? n : null)) : [null, null, null])) : [],
   )
-  const [plan, setPlan] = useState<Plan | null>(null)
+  const [built, setBuilt] = useState<{ plan: Plan; key: string } | null>(null)
   const [busy, setBusy] = useState(false)
 
   const roster = useMemo(() => new Set(rosterList), [rosterList])
@@ -34,15 +34,16 @@ export default function App() {
     if (manual.some((t) => t.some((n) => n && !roster.has(n)))) setManual(manual.map((t) => t.map((n) => (n && roster.has(n) ? n : null))))
   }, [roster, manual, setManual])
 
-  // Step 3 rebuilds by itself whenever the roster, your own teams or the cycle option change.
-  useEffect(() => {
+  // Teams are only built when the button is pressed, so selecting Resonators stays fast.
+  const inputKey = JSON.stringify([rosterList, manual, cycle])
+  const stale = !!built && built.key !== inputKey
+  const build = () => {
     setBusy(true)
-    const id = setTimeout(() => {
-      setPlan(planRest(rosterList, manual, (n) => usesFor(n, cycle)))
+    setTimeout(() => {
+      setBuilt({ plan: planRest(rosterList, manual, (n) => usesFor(n, cycle)), key: inputKey })
       setBusy(false)
-    }, 200)
-    return () => clearTimeout(id)
-  }, [rosterList, manual, cycle])
+    }, 30)
+  }
 
   const capacity = useMemo(() => {
     const caps: Record<string, number> = {}
@@ -86,11 +87,14 @@ export default function App() {
 
       <section className="panel" aria-labelledby="s3">
         <h2 id="s3"><span className="step">3</span>Build the rest</h2>
-        <label className="switch why-switch">
-          <input type="checkbox" checked={why} onChange={(e) => setWhy(e.target.checked)} />
-          <span>Show team reasoning</span>
-        </label>
-        <Results plan={plan} busy={busy} showWhy={why} />
+        <div className="build-bar">
+          <button className="btn primary" onClick={build} disabled={busy || rosterList.length < 3}>{busy ? 'Building…' : 'Build teams'}</button>
+          <label className="switch why-switch">
+            <input type="checkbox" checked={why} onChange={(e) => setWhy(e.target.checked)} />
+            <span>Show team reasoning</span>
+          </label>
+        </div>
+        <Results plan={built?.plan ?? null} busy={busy} stale={stale} showWhy={why} />
       </section>
 
       <footer className="foot">Unofficial fan tool, not affiliated with Kuro Games. Ratings and synergies are rough estimates.</footer>

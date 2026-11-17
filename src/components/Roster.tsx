@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import { RESONATORS, CYCLE_BONUS, CATEGORY_LABEL, isRover, usesFor, type Category, type Element, type Role, type Resonator } from '../data/characters'
 import { ELEMENT_COLOR, Medal, Stars } from './Medal'
+import { usePersistent } from '../lib/storage'
 
 const SORTS = {
   nameUp: ['Name A–Z', (a: Resonator, b: Resonator) => a.name.localeCompare(b.name)],
@@ -33,6 +34,9 @@ export function Roster({ roster, cycleBonus, onToggle, onSetMany }: Props) {
   const [sort, setSort] = useState<SortKey>('nameUp')
   const [el, setEl] = useState<Element | null>(null)
   const [role, setRole] = useState<Role | null>(null)
+  // Sections the player has folded away: 'premium', 'standard', 'fourstar', 'rover'.
+  const [closed, setClosed] = usePersistent<string[]>('wuwa-endstate-closed', [], (r) => (Array.isArray(r) ? r.filter((x) => typeof x === 'string') : []))
+  const flip = (id: string) => setClosed(closed.includes(id) ? closed.filter((x) => x !== id) : [...closed, id])
 
   const shown = useMemo(
     () => RESONATORS.filter((c) => (!el || c.element === el) && (!role || c.role === role) && c.name.toLowerCase().includes(q.trim().toLowerCase())).sort(SORTS[sort][1]),
@@ -101,17 +105,28 @@ export function Roster({ roster, cycleBonus, onToggle, onSetMany }: Props) {
         return (
           <div key={cat} className="group">
             <div className="divider">
-              <h3>{CATEGORY_LABEL[cat]}</h3>
+              <button className="fold" aria-expanded={!closed.includes(cat)} aria-controls={`sec-${cat}`} onClick={() => flip(cat)}>
+                <span className="chev" aria-hidden="true" />
+                <h3>{CATEGORY_LABEL[cat]}</h3>
+              </button>
               {quick && <button className="btn small" onClick={() => onSetMany(quick.names, true)}>{quick.label}</button>}
               <span className="rule" />
               <small>{main.filter((c) => roster.has(c.name)).length}/{main.length}</small>
             </div>
-            {main.length > 0 && <div className="roster-grid">{main.map(tile)}</div>}
-            {rovers.length > 0 && (
-              <>
-                <h4 className="subdivider">Select your rover</h4>
-                <div className="roster-grid">{rovers.map(tile)}</div>
-              </>
+            {!closed.includes(cat) && (
+              <div id={`sec-${cat}`}>
+                {main.length > 0 && <div className="roster-grid">{main.map(tile)}</div>}
+                {rovers.length > 0 && (
+                  <>
+                    <h4 className="subdivider">
+                      <button className="fold" aria-expanded={!closed.includes('rover')} aria-controls="sec-rover" onClick={() => flip('rover')}>
+                        <span className="chev" aria-hidden="true" />Select your rover
+                      </button>
+                    </h4>
+                    {!closed.includes('rover') && <div id="sec-rover" className="roster-grid">{rovers.map(tile)}</div>}
+                  </>
+                )}
+              </div>
             )}
           </div>
         )

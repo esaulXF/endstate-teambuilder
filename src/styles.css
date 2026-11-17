@@ -165,3 +165,14 @@ select.field { cursor: pointer; }
 .tag.tier-T0, .tag.tier-T05 { color: #f1d27a; border-color: rgba(241,210,122,.5); }
 
 .why-switch { margin: 0 0 12px; }
+
+.build-bar { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 20px; margin-bottom: 14px; }
+.build-bar .switch { margin-top: 0; }
+.hint.stale { color: var(--gold); margin: 0 0 10px; }
+.fold { display: inline-flex; align-items: center; gap: 10px; background: none; border: 0; padding: 4px 0; color: inherit; text-align: left; }
+.fold h3 { margin: 0; }
+.fold:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
+.chev { width: 9px; height: 9px; border-right: 2px solid var(--cyan); border-bottom: 2px solid var(--cyan); transform: rotate(45deg); transition: transform 0.18s; margin: -3px 2px 0 2px; }
+.fold[aria-expanded="false"] .chev { transform: rotate(-45deg); margin-top: 0; }
+.subdivider .fold { font: inherit; color: inherit; }
+@media (prefers-reduced-motion: reduce) { .chev { transition: none; } }

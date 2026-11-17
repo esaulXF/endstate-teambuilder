@@ -18,12 +18,14 @@ function Tags({ team }: { team: string[] }) {
   )
 }
 
-export function Results({ plan, busy, showWhy }: { plan: Plan | null; busy: boolean; showWhy: boolean }) {
-  if (!plan || plan.kind === 'empty') return <p className="empty">Select at least 3 Resonators in step 1 to see teams here.</p>
+export function Results({ plan, busy, stale, showWhy }: { plan: Plan | null; busy: boolean; stale: boolean; showWhy: boolean }) {
+  if (!plan) return <p className="empty">Press Build teams to see your teams here.</p>
+  if (plan.kind === 'empty') return <p className="empty">Select at least 3 Resonators in step 1 to see teams here.</p>
   if (plan.kind === 'fix') return <p className="empty bad">Finish or fix your teams in step 2 to build the rest.</p>
   const { teams, leftover, manual, summary } = plan
   return (
-    <div className={busy ? 'results busy' : 'results'}>
+    <div className={busy || stale ? 'results busy' : 'results'}>
+      {stale && <p className="hint stale" role="status">Your roster changed. Press Build teams to update.</p>}
       <p className="lede" role="status">{summary}</p>
       {teams.length === 0 && <p className="empty">Not enough Resonators left for a full team.</p>}
       <div className="team-grid">

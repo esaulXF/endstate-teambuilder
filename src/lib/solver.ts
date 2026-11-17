@@ -4,7 +4,17 @@ import { synergyScore } from '../data/synergy'
 export type Team = string[] // up to 3 Resonator names
 
 /** Team score: power, role balance, effect links between kits and known build tiers (see data/synergy.ts). Not official. */
+const SCORE_CACHE = new Map<string, number>()
 export function scoreTeam(team: Team): number {
+  const key = [...team].sort().join('|')
+  const hit = SCORE_CACHE.get(key)
+  if (hit !== undefined) return hit
+  const v = computeScore(team)
+  SCORE_CACHE.set(key, v)
+  return v
+}
+
+function computeScore(team: Team): number {
   const m = team.map((n) => BY_NAME[n])
   let s = 0, dps = 0, sup = 0
   m.forEach((c) => { s += c.power; if (c.role === 'Main DPS') dps++; if (c.role === 'Support') sup++ })
@@ -84,7 +94,7 @@ export function solve(pool: string[], caps: Record<string, number>, count: numbe
   }
   let best: (string | null)[] = Array(slots).fill(null)
   let bestScore = -Infinity
-  const rounds = count > 8 ? 6 : 14
+  const rounds = count > 8 ? 4 : 8
   for (let r = 0; r < rounds; r++) {
     const sl: (string | null)[] = Array(slots).fill(null)
     pool.map((n) => [n, BY_NAME[n].power + R() * 4] as const).sort((a, b) => b[1] - a[1]).forEach(([n]) => {
