@@ -108,7 +108,8 @@ export const PROFILES: Record<string, Profile> = {
   Taoqi: P('Shield', ['starter'], ['Shield'], [], 'low'),
   Verina: P('Healing', ['starter'], ['Healing:3', 'Team ATK:3', 'All DMG Amp:1'], [], 'high'),
   'Xiangli Yao': P('Liberation', ['liberation'], ['Liberation DMG'], ['Liberation DMG:3', 'Coordinated Attack:1'], 'med'),
-  Yangyang: P('Basic Attack', ['starter'], ['Aero Erosion:1'], [], 'low'),
+  // Original 4-star Yangyang (Aero Sword). NOT Yangyang: Xuanling. Her job is Energy refills for the next Resonator.
+  Yangyang: P('Energy support', ['starter'], ['Energy:3', 'Team ATK:1'], [], 'med', 'Support'),
   'Yangyang: Xuanling': P('Heavy Attack', ['havoc-bane'], ['Havoc Bane:3', 'Tune Break', 'Echo Skill DMG'], ['Negative Status:3', 'Heavy Attack DMG:3', 'Havoc Bane:2']),
   Yinlin: P('Coordinated Attack', ['coordinated'], ['Coordinated Attack', 'All DMG Amp:3', 'Liberation DMG', 'Team ATK'], ['Energy'], 'med'),
   Youhu: P('Healing', ['starter'], ['Healing'], [], 'low'),
@@ -134,7 +135,8 @@ export const BUILDS: Build[] = [
   ...B('T0.5', 'tune-break', 'Aemeath/Lynae/Mornye', 'Aemeath/Denia/Chisa', `${LH}/Denia/Mornye`),
   ...B('T0.5', 'echo-skill', 'Sigrika/Qiuyuan/Lily'),
   ...B('T0.5', 'electro-flare', `Hsin/${RE}/Buling`, `Hsin/${RE}/Suisui`),
-  ...B('T1', 'echo-skill', 'Sigrika/Qiuyuan/Shorekeeper', 'Sigrika/Lucilla/Shorekeeper', 'Sigrika/Qiuyuan/Ciaccona', 'Sigrika/Lucilla/Lily', 'Galbrena/Qiuyuan/Shorekeeper', 'Galbrena/Lupa/Mornye', 'Galbrena/Lupa/Shorekeeper', 'Galbrena/Qiuyuan/Lily', 'Phrolova/Cantarella/Qiuyuan', 'Phrolova/Cantarella/Shorekeeper', 'Phrolova/Cantarella/Buling'),
+  ...B('T1', 'echo-skill', 'Sigrika/Qiuyuan/Shorekeeper', 'Sigrika/Lucilla/Shorekeeper', 'Sigrika/Qiuyuan/Ciaccona', 'Sigrika/Lucilla/Lily', 'Galbrena/Qiuyuan/Shorekeeper', 'Galbrena/Lupa/Mornye', 'Galbrena/Lupa/Shorekeeper', 'Galbrena/Qiuyuan/Lily'),
+  ...B('T1', 'coordinated', 'Phrolova/Cantarella/Qiuyuan', 'Phrolova/Cantarella/Shorekeeper', 'Phrolova/Cantarella/Buling'),
   ...B('T1', 'heavy-shield', 'Augusta/Iuno/Shorekeeper', 'Augusta/Rebecca/Shorekeeper', 'Jingran/Lupa/Mornye', 'Jingran/Lynae/Mornye', 'Iuno/Yinlin/Shorekeeper'),
   ...B('T1', 'tune-break', 'Qingxiao/Lynae/Mornye', 'Qingxiao/Sanhua/Mornye', 'Qingxiao/Denia/Ciaccona', `${LH}/Lynae/Mornye`, 'Suoming/Lynae/Mornye', 'Aemeath/Lupa/Mornye', 'Galbrena/Denia/Lupa'),
   ...B('T1', 'havoc-bane', `${YX}/Rebecca/Chisa`, `${YX}/Rebecca/Suisui`, `${YX}/Lynae/Mornye`, `${YX}/Phrolova/Shorekeeper`, `${YX}/Chisa/Shorekeeper`, 'Hiyuki/Lynae/Chisa', 'Hiyuki/Chisa/Shorekeeper', 'Hiyuki/Lynae/Mornye', `Hsin/${RE}/Chisa`),
@@ -148,7 +150,8 @@ export const BUILDS: Build[] = [
   ...B('T2', 'hack', 'Lucy/Rebecca/Verina'),
   ...B('T2', 'heavy-shield', 'Augusta/Mortefi/Shorekeeper'),
   ...B('T3', 'skill-fusion', 'Carlotta/Zhezhi/Shorekeeper', 'Carlotta/Zhezhi/Baizhi', 'Carlotta/Zhezhi/Buling', 'Changli/Chixia/Baizhi', 'Jinhsi/Zhezhi/Buling'),
-  ...B('T3', 'liberation', `${XY}/Lynae/Mornye`, `${XY}/Yinlin/Verina`, `${XY}/Yinlin/Shorekeeper`, `${XY}/Jianxin/Shorekeeper`, `Calcharo/${XY}/Shorekeeper`, 'Calcharo/Yinlin/Shorekeeper'),
+  ...B('T3', 'skill-fusion', 'Changli/Yangyang/Shorekeeper'),
+  ...B('T3', 'liberation', `${XY}/Yangyang/Shorekeeper`, `${XY}/Lynae/Mornye`, `${XY}/Yinlin/Verina`, `${XY}/Yinlin/Shorekeeper`, `${XY}/Jianxin/Shorekeeper`, `Calcharo/${XY}/Shorekeeper`, 'Calcharo/Yinlin/Shorekeeper'),
   ...B('T3', 'coordinated', 'Yinlin/Youhu/Shorekeeper', 'Zhezhi/Yinlin/Youhu'),
   ...B('T3', 'basic-attack', 'Camellya/Sanhua/Shorekeeper', 'Camellya/Sanhua/Baizhi', 'Brant/Sanhua/Verina', 'Encore/Sanhua/Shorekeeper', 'Lingyang/Sanhua/Shorekeeper', 'Lumi/Sanhua/Shorekeeper'),
   ...B('T3', 'starter', `${RH}/Roccia/Shorekeeper`, `${RH}/Danjin/Shorekeeper`, `${RH}/Sanhua/Verina`, 'Jiyan/Mortefi/Shorekeeper', 'Jiyan/Aalto/Shorekeeper', `Iuno/Ciaccona/${RA}`),
@@ -197,7 +200,9 @@ export function bestBuild(team: string[]): { build: Build; exact: boolean } | nu
   let best: { build: Build; exact: boolean; v: number } | null = null
   for (const b of BUILDS) {
     const n = b.team.filter((m) => team.includes(m)).length
-    if (n < 2) continue
+    // A partial match must include the build's main Resonator, so swapping the main for a different
+    // character (e.g. Yangyang instead of Yangyang: Xuanling) never counts as that build.
+    if (n < 2 || (n < 3 && !team.includes(b.team[0]))) continue
     const v = TIER_POINTS[b.tier] * (n === 3 ? 1 : 0.3)
     if (!best || v > best.v) best = { build: b, exact: n === 3, v }
   }
@@ -218,4 +223,22 @@ export function synergyScore(team: string[], isDps: (n: string) => boolean): num
   }
   const bb = bestBuild(team)
   return Math.min(s, LINK_CAP) + (bb ? TIER_POINTS[bb.build.tier] * (bb.exact ? 1 : 0.3) : 0)
+}
+
+/** Short label for a team shown next to its number, e.g. "Glacio Chafe" or "Havoc Bane". */
+export function describeTeam(team: string[], roleOf: (n: string) => string): string {
+  const bb = bestBuild(team)
+  if (bb?.exact) return ARCHETYPES[bb.build.arch].label
+  const score = new Map<ArchetypeId, number>()
+  const members = team.filter((n) => PROFILES[n])
+  for (const n of members) {
+    const w = roleOf(n) === 'Main DPS' ? 2 : roleOf(n) === 'Sub-DPS' ? 1.5 : 1
+    PROFILES[n].arch.forEach((a, i) => score.set(a, (score.get(a) ?? 0) + w * (i ? 0.7 : 1)))
+  }
+  const count = (a: ArchetypeId) => members.filter((n) => PROFILES[n].arch.includes(a)).length
+  const ranked = [...score.entries()].filter(([a]) => a !== 'starter' && count(a) >= 2).sort((x, y) => y[1] - x[1])
+  if (ranked.length) return ARCHETYPES[ranked[0][0]].label
+  if (members.every((n) => PROFILES[n].arch.every((a) => a === 'starter'))) return 'Early game'
+  if (bb) return ARCHETYPES[bb.build.arch].label
+  return 'Mixed'
 }

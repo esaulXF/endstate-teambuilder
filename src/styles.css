@@ -176,3 +176,5 @@ select.field { cursor: pointer; }
 .fold[aria-expanded="false"] .chev { transform: rotate(-45deg); margin-top: 0; }
 .subdivider .fold { font: inherit; color: inherit; }
 @media (prefers-reduced-motion: reduce) { .chev { transition: none; } }
+
+.team-head h3 .desc { margin-left: 10px; font: 600 14px var(--body); color: var(--gold); letter-spacing: 0.02em; }

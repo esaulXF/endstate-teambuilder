@@ -85,3 +85,13 @@ assert.ok(scoreTeam(['Yangyang: Xuanling', 'Chisa', 'Suisui']) > scoreTeam(['Yan
 assert.ok(scoreTeam(['Hsin', 'Suoming', 'Lily']) > scoreTeam(['Hsin', 'Aalto', 'Taoqi']))
 assert.equal(bestBuild(['Qingxiao', 'Denia', 'Mornye'])?.build.tier, 'T0')
 console.log('synergy tests passed')
+
+// Yangyang and Yangyang: Xuanling are different characters
+import { describeTeam } from '../src/data/synergy'
+const role = (n: string) => BY_NAME[n].role
+assert.notEqual(BY_NAME['Yangyang'].element, BY_NAME['Yangyang: Xuanling'].element)
+assert.equal(describeTeam(['Hiyuki', 'Lucilla', 'Suisui'], role), 'Glacio Chafe')
+assert.equal(describeTeam(['Yangyang: Xuanling', 'Chisa', 'Suisui'], role), 'Havoc Bane')
+assert.equal(bestBuild(['Yangyang', 'Chisa', 'Suisui'])?.build.team.includes('Yangyang: Xuanling') ?? false, false, 'plain Yangyang must not match the Xuanling build')
+assert.notEqual(describeTeam(['Yangyang', 'Chisa', 'Suisui'], role), 'Havoc Bane' + '!')
+console.log('descriptor tests passed')

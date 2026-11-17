@@ -2,7 +2,7 @@ import { motion } from 'framer-motion'
 import { BY_NAME } from '../data/characters'
 import { ELEMENT_COLOR, Medal, Stars } from './Medal'
 import type { Plan } from '../lib/plan'
-import { ARCHETYPES, bestBuild, teamLinks } from '../data/synergy'
+import { ARCHETYPES, bestBuild, describeTeam, teamLinks } from '../data/synergy'
 
 const isDps = (n: string) => BY_NAME[n].role !== 'Support'
 
@@ -31,7 +31,7 @@ export function Results({ plan, busy, stale, showWhy }: { plan: Plan | null; bus
       <div className="team-grid">
         {teams.map((t, i) => (
           <motion.article key={t.join('|')} className="team-card built" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(i, 8) * 0.04, duration: 0.3 }}>
-            <header className="team-head"><h3>Team {i + 1}</h3></header>
+            <header className="team-head"><h3>Team {i + 1}<span className="desc">{describeTeam(t, (n) => BY_NAME[n].role)}</span></h3></header>
             {t.map((n) => {
               const c = BY_NAME[n]
               const also = teams.map((x, j) => (j !== i && x.includes(n) ? `Team ${j + 1}` : '')).filter(Boolean)
