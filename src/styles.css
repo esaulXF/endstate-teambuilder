@@ -104,7 +104,7 @@ button, select, input { font: inherit; color: inherit; }
 button { cursor: pointer; }
 :focus-visible { outline: 2px solid var(--sec); outline-offset: 2px; }
 
-.shell { max-width: 2000px; margin: 0 auto; padding: calc(24px + env(safe-area-inset-top, 0)) clamp(16px, 3vw, 56px) calc(56px + env(safe-area-inset-bottom, 0)); display: grid; gap: 20px; }
+.shell { max-width: 2000px; margin: 0 auto; padding: calc(24px + env(safe-area-inset-top, 0)) clamp(16px, 6vw, 140px) calc(56px + env(safe-area-inset-bottom, 0)); display: grid; gap: 20px; }
 .topbar { display: flex; justify-content: flex-end; }
 
 .theme-switch { position: relative; display: inline-grid; grid-template-columns: repeat(3, 1fr); padding: 3px; border: 1px solid var(--acc); border-radius: 999px; background: oklch(var(--sec-c) / 0.12); }
@@ -141,13 +141,13 @@ button { cursor: pointer; }
 /* ---------- panels ---------- */
 .panel {
   --clip: polygon(0 0, calc(100% - var(--cut)) 0, 100% var(--cut), 100% 100%, var(--cut) 100%, 0 calc(100% - var(--cut)));
-  position: relative; isolation: isolate; padding: 26px 24px 24px; background: var(--line); clip-path: var(--clip);
+  position: relative; isolation: isolate; padding: 18px 18px 18px; background: var(--line); clip-path: var(--clip);
 }
 .panel::before { content: ''; position: absolute; inset: 1px; z-index: -1; background: linear-gradient(180deg, oklch(var(--raise-c) / 0.96), oklch(var(--panel-c) / 0.97)); clip-path: var(--clip); }
 .panel::after { content: ''; position: absolute; top: 0; left: 0; width: 84px; height: 3px; background: var(--sec); }
-.panel h2 { font-size: 30px; display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+.panel h2 { font-size: 24px; display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
 .panel h2 small { font: 500 14px var(--body); color: var(--dim); border: 1px solid var(--edge); padding: 1px 8px; }
-.step { display: grid; place-items: center; width: 34px; height: 34px; font: 700 20px var(--display); color: var(--on-sec); background: var(--sec); clip-path: polygon(0 0, 100% 0, 100% 70%, 70% 100%, 0 100%); }
+.step { display: grid; place-items: center; width: 28px; height: 28px; font: 700 17px var(--display); color: var(--on-sec); background: var(--sec); clip-path: polygon(0 0, 100% 0, 100% 70%, 70% 100%, 0 100%); }
 .panel .lede { margin-bottom: 14px; }
 
 /* ---------- controls ---------- */
@@ -262,7 +262,7 @@ select.field { cursor: pointer; }
 
 /* ---------- wide screens: two columns and a larger UI ---------- */
 @media (min-width: 1100px) {
-  .shell { grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); align-items: start; grid-template-rows: auto auto auto 1fr auto; gap: 22px; }
+  .shell { grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); align-items: start; grid-template-rows: auto auto auto 1fr auto; gap: 16px 20px; }
   .shell > .topbar, .shell > .hero, .shell > .foot { grid-column: 1 / -1; }
   .shell > .foot { grid-row: 5; }
   .hero { padding: 0; }
