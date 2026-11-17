@@ -11,6 +11,9 @@ assert.equal(usesFor('Denia', false), 1)
 assert.equal(usesFor('Denia', true), 2)
 for (const n of PERMANENT_TWO_USE) assert.equal(usesFor(n, false), 2)
 assert.equal(usesFor('Aemeath', true), 1)
+assert.equal(usesFor('Lily', false), 2)
+assert.equal(RESONATORS.filter((c) => c.category === 'standard').map((c) => c.name).sort().join(','), 'Calcharo,Encore,Jianxin,Lingyang,Rover (Aero),Rover (Electro),Rover (Havoc),Rover (Spectro),Verina')
+assert.equal(RESONATORS.filter((c) => c.category === 'fourstar').length, 12)
 
 function check(cycle: boolean, used: string[] = []) {
   const caps: Record<string, number> = {}

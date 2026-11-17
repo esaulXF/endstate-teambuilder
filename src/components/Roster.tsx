@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
-import { RESONATORS, CYCLE_BONUS, usesFor, type Element, type Role, type Resonator } from '../data/characters'
+import { RESONATORS, CYCLE_BONUS, CATEGORY_LABEL, usesFor, type Category, type Element, type Role, type Resonator } from '../data/characters'
 import { ELEMENT_COLOR, Medal, Stars } from './Medal'
 
 const SORTS = {
@@ -8,11 +8,10 @@ const SORTS = {
   nameDown: ['Name Z–A', (a: Resonator, b: Resonator) => b.name.localeCompare(a.name)],
   newest: ['Release: newest first', (a: Resonator, b: Resonator) => parseFloat(b.version) - parseFloat(a.version) || a.name.localeCompare(b.name)],
   oldest: ['Release: oldest first', (a: Resonator, b: Resonator) => parseFloat(a.version) - parseFloat(b.version) || a.name.localeCompare(b.name)],
-  r5: ['Rarity: 5★ first', (a: Resonator, b: Resonator) => b.rarity - a.rarity || a.name.localeCompare(b.name)],
-  r4: ['Rarity: 4★ first', (a: Resonator, b: Resonator) => a.rarity - b.rarity || a.name.localeCompare(b.name)],
 } as const
 type SortKey = keyof typeof SORTS
 
+const CATEGORIES: Category[] = ['premium', 'standard', 'fourstar']
 const ELEMENTS: Element[] = ['Fusion', 'Glacio', 'Aero', 'Electro', 'Spectro', 'Havoc']
 const ROLES: Role[] = ['Main DPS', 'Sub-DPS', 'Support']
 
@@ -57,12 +56,19 @@ export function Roster({ roster, cycleBonus, onToggle, onSetMany }: Props) {
           <button key={x} className="chip" aria-pressed={role === x} onClick={() => setRole(role === x ? null : x)}>{x}</button>
         ))}
         <span className="spacer" />
+        <button className="btn" onClick={() => onSetMany(RESONATORS.filter((c) => c.category === 'standard').map((c) => c.name), true)}>Add standard characters</button>
         <button className="btn ghost" onClick={() => onSetMany(shown.map((c) => c.name), true)}>Select shown</button>
         <button className="btn ghost" onClick={() => onSetMany(shown.map((c) => c.name), false)}>Clear shown</button>
       </div>
 
-      <div className="roster-grid">
-        {shown.map((c) => {
+      {CATEGORIES.map((cat) => {
+        const list = shown.filter((c) => c.category === cat)
+        if (!list.length) return null
+        return (
+          <div key={cat} className="group">
+            <h3 className="divider"><span>{CATEGORY_LABEL[cat]}</span><small>{list.filter((c) => roster.has(c.name)).length}/{list.length}</small></h3>
+            <div className="roster-grid">
+            {list.map((c) => {
           const on = roster.has(c.name)
           const uses = usesFor(c.name, cycleBonus)
           const cyc = cycleBonus && CYCLE_BONUS.resonators.includes(c.name)
@@ -86,8 +92,11 @@ export function Roster({ roster, cycleBonus, onToggle, onSetMany }: Props) {
             </motion.button>
           )
         })}
-        {shown.length === 0 && <p className="empty">No Resonators match these filters. Clear a filter or change the search.</p>}
-      </div>
+            </div>
+          </div>
+        )
+      })}
+      {shown.length === 0 && <p className="empty">No Resonators match these filters. Clear a filter or change the search.</p>}
     </div>
   )
 }

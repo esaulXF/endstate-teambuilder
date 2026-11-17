@@ -4,6 +4,8 @@
 export type Element = 'Fusion' | 'Glacio' | 'Aero' | 'Electro' | 'Spectro' | 'Havoc'
 export type Role = 'Main DPS' | 'Sub-DPS' | 'Support'
 
+export type Category = 'premium' | 'standard' | 'fourstar'
+
 export interface Resonator {
   name: string
   element: Element
@@ -11,6 +13,7 @@ export interface Resonator {
   power: number
   rarity: 4 | 5
   version: string
+  category: Category
 }
 
 const E: Record<string, Element> = { F: 'Fusion', G: 'Glacio', A: 'Aero', E: 'Electro', S: 'Spectro', H: 'Havoc' }
@@ -34,9 +37,16 @@ VERSIONS.forEach(([v, list]) => list.split(',').forEach((n) => (VERSION_OF[n] = 
 
 const FOUR_STAR = new Set(['Aalto', 'Baizhi', 'Buling', 'Chixia', 'Danjin', 'Lumi', 'Mortefi', 'Sanhua', 'Taoqi', 'Yangyang', 'Yuanwu', 'Youhu'])
 
+// Standard-banner 5-stars plus the Rover forms. Every other 5-star is premium (limited).
+export const STANDARD = new Set(['Calcharo', 'Encore', 'Jianxin', 'Lingyang', 'Verina', 'Rover (Aero)', 'Rover (Electro)', 'Rover (Havoc)', 'Rover (Spectro)'])
+
+export const CATEGORY_LABEL: Record<Category, string> = { premium: 'Premium characters', standard: 'Standard characters', fourstar: '4-star characters' }
+
 export const RESONATORS: Resonator[] = RAW.split('|').map((s) => {
   const [name, e, r, p] = s.split(',')
-  return { name, element: E[e], role: R[r], power: +p, rarity: FOUR_STAR.has(name) ? 4 : 5, version: VERSION_OF[name] ?? '0' }
+  const rarity = FOUR_STAR.has(name) ? 4 : 5
+  const category: Category = rarity === 4 ? 'fourstar' : STANDARD.has(name) ? 'standard' : 'premium'
+  return { name, element: E[e], role: R[r], power: +p, rarity, version: VERSION_OF[name] ?? '0', category }
 })
 
 export const BY_NAME: Record<string, Resonator> = Object.fromEntries(RESONATORS.map((c) => [c.name, c]))
@@ -54,7 +64,7 @@ GROUPS.forEach((g) => g.forEach((a) => g.forEach((b) => { if (a < b) SYNERGY.add
 
 // ---- Endstate Matrix uses ----
 // Default: every Resonator has 1 use. These support characters have 2 permanently.
-export const PERMANENT_TWO_USE = new Set(['Shorekeeper', 'Verina', 'Mornye', 'Baizhi', 'Suisui', 'Buling'])
+export const PERMANENT_TWO_USE = new Set(['Shorekeeper', 'Verina', 'Mornye', 'Baizhi', 'Suisui', 'Buling', 'Lily'])
 
 // Extra second uses from the current challenge cycle (Emergency Agent bonus).
 // PLACEHOLDER for Adversity Vanguard (3.8): update this list when the next cycle starts.

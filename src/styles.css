@@ -95,6 +95,11 @@ select.field { cursor: pointer; }
 .btn:disabled { opacity: 0.38; cursor: not-allowed; box-shadow: none; }
 
 /* ---------- roster tiles ---------- */
+.group { margin-top: 20px; }
+.divider { display: flex; align-items: center; gap: 14px; font-size: 22px; font-weight: 600; margin-bottom: 4px; }
+.divider::after { content: ''; flex: 1; order: 1; height: 1px; background: linear-gradient(90deg, var(--edge), transparent); }
+.divider small { order: 2; font: 500 13px var(--body); color: var(--dim); }
+.divider span { order: 0; }
 .roster-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(236px, 1fr)); gap: 10px; margin-top: 14px; }
 .tile {
   --clip: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
