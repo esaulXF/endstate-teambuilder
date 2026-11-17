@@ -88,11 +88,5 @@ export function explainTeam(team: string[], ctx: ExplainContext): Explain {
   }
   if (unmet.length && !bb?.exact) lines.push(`Not covered: ${unmet.slice(0, 3).join('; ')} and nobody on this team provides it.`)
 
-  // Placement
-  const n = ctx.teams.length
-  if (ctx.index === 0) lines.push('Built first from every Resonator that was free, so it takes the strongest combination available.')
-  else if (ctx.index === n - 1 && n > 2) lines.push('Built last from what was left. Teams are ordered best first on purpose, so the weakest team absorbs the leftovers instead of splitting good Resonators across two average teams.')
-  else lines.push(`Built ${ctx.index + 1}${ctx.index === 1 ? 'nd' : ctx.index === 2 ? 'rd' : 'th'}, from the Resonators that were still free after the stronger teams were set.`)
-
   return { based, lines }
 }
