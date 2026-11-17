@@ -7,8 +7,8 @@ import { usePersistent } from '../lib/storage'
 const SORTS = {
   nameUp: ['Name A–Z', (a: Resonator, b: Resonator) => a.name.localeCompare(b.name)],
   nameDown: ['Name Z–A', (a: Resonator, b: Resonator) => b.name.localeCompare(a.name)],
-  newest: ['Release: newest first', (a: Resonator, b: Resonator) => parseFloat(b.version) - parseFloat(a.version) || a.name.localeCompare(b.name)],
-  oldest: ['Release: oldest first', (a: Resonator, b: Resonator) => parseFloat(a.version) - parseFloat(b.version) || a.name.localeCompare(b.name)],
+  newest: ['Release: Newest First', (a: Resonator, b: Resonator) => parseFloat(b.version) - parseFloat(a.version) || a.name.localeCompare(b.name)],
+  oldest: ['Release: Oldest First', (a: Resonator, b: Resonator) => parseFloat(a.version) - parseFloat(b.version) || a.name.localeCompare(b.name)],
 } as const
 type SortKey = keyof typeof SORTS
 
@@ -18,8 +18,8 @@ const ROLES: Role[] = ['Main DPS', 'Sub-DPS', 'Support']
 
 // Quick-add targets. Rovers are excluded: only one Rover can be selected at a time.
 const QUICK_ADD: Partial<Record<Category, { label: string; names: string[] }>> = {
-  standard: { label: 'Add standard characters', names: RESONATORS.filter((c) => c.category === 'standard' && !isRover(c.name)).map((c) => c.name) },
-  fourstar: { label: 'Add 4-star characters', names: RESONATORS.filter((c) => c.category === 'fourstar').map((c) => c.name) },
+  standard: { label: 'Add Standard Characters', names: RESONATORS.filter((c) => c.category === 'standard' && !isRover(c.name)).map((c) => c.name) },
+  fourstar: { label: 'Add 4-Star Characters', names: RESONATORS.filter((c) => c.category === 'fourstar').map((c) => c.name) },
 }
 
 interface Props {
@@ -92,8 +92,8 @@ export function Roster({ roster, cycleBonus, onToggle, onSetMany }: Props) {
           <button key={x} className="chip" aria-pressed={role === x} onClick={() => setRole(role === x ? null : x)}>{x}</button>
         ))}
         <span className="spacer" />
-        <button className="btn ghost" onClick={() => onSetMany(shown.map((c) => c.name), true)}>Select shown</button>
-        <button className="btn ghost" onClick={() => onSetMany(shown.map((c) => c.name), false)}>Clear shown</button>
+        <button className="btn ghost" onClick={() => onSetMany(shown.map((c) => c.name), true)}>Select Shown</button>
+        <button className="btn ghost" onClick={() => onSetMany(shown.map((c) => c.name), false)}>Clear Shown</button>
       </div>
 
       {CATEGORIES.map((cat) => {
@@ -120,7 +120,7 @@ export function Roster({ roster, cycleBonus, onToggle, onSetMany }: Props) {
                   <>
                     <h4 className="subdivider">
                       <button className="fold" aria-expanded={!closed.includes('rover')} aria-controls="sec-rover" onClick={() => flip('rover')}>
-                        <span className="chev" aria-hidden="true" />Select your rover
+                        <span className="chev" aria-hidden="true" />Select Your Rover
                       </button>
                     </h4>
                     {!closed.includes('rover') && <div id="sec-rover" className="roster-grid">{rovers.map(tile)}</div>}

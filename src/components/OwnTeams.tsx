@@ -26,18 +26,18 @@ export function OwnTeams({ roster, teams, usesOf, onChange }: Props) {
     : ''
   return (
     <div>
-      <div className="toolbar"><button className="btn" onClick={() => onChange([...teams, [null, null, null]])}>Add a team</button></div>
+      <div className="toolbar"><button className="btn" onClick={() => onChange([...teams, [null, null, null]])}>Add a Team</button></div>
       <div className="team-grid">
         <AnimatePresence initial={false}>
           {teams.map((t, ti) => (
             <motion.div key={ti} layout className="team-card" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.96 }}>
               <header className="team-head">
-                <h3>Your team {ti + 1}</h3>
+                <h3>Your Team {ti + 1}</h3>
                 <button className="btn ghost small" onClick={() => onChange(teams.filter((_, i) => i !== ti))} aria-label={`Remove your team ${ti + 1}`}>Remove</button>
               </header>
               {t.map((v, si) => (
                 <select key={si} className="field slot" aria-label={`Team ${ti + 1}, slot ${si + 1}`} value={v ?? ''} onChange={(e) => setSlot(ti, si, e.target.value || null)}>
-                  <option value="">Empty slot</option>
+                  <option value="">Empty Slot</option>
                   {sorted.map((n) => (
                     <option key={n} value={n} disabled={n !== v && (t.includes(n) || (usage[n] || 0) >= usesOf(n))}>{n} ({BY_NAME[n].rarity}★)</option>
                   ))}

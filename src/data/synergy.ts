@@ -37,7 +37,7 @@ export const ARCHETYPES: Record<ArchetypeId, { label: string; blurb: string }> =
   'skill-fusion': { label: 'Resonance Skill', blurb: 'Resonance Skill carries with skill amplifiers (Fusion and Spectro).' },
   liberation: { label: 'Liberation', blurb: 'Liberation burst damage with Liberation DMG amplifiers.' },
   'basic-attack': { label: 'Basic Attack', blurb: 'Basic Attack scalers with Basic Attack DMG amplifiers.' },
-  starter: { label: 'Early game / F2P', blurb: 'Free or early-game Resonators with simple teams.' },
+  starter: { label: 'Early Game / F2P', blurb: 'Free or early-game Resonators with simple teams.' },
 }
 
 export interface Profile {
@@ -249,7 +249,7 @@ export function describeTeam(team: string[], roleOf: (n: string) => string): str
   }
   const ranked = [...score.entries()].filter(([a]) => a !== 'starter' && count(a) >= 2).sort((x, y) => y[1] - x[1])
   if (ranked.length) return buildLabel(ranked[0][0])
-  if (members.every((n) => PROFILES[n].arch.every((a) => a === 'starter'))) return 'Early game'
+  if (members.every((n) => PROFILES[n].arch.every((a) => a === 'starter'))) return 'Early Game'
   if (bb) return buildLabel(bb.build.arch)
   return 'Mixed'
 }

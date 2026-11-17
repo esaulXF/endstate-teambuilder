@@ -43,7 +43,7 @@ export const STANDARD = new Set(['Calcharo', 'Encore', 'Jianxin', 'Lingyang', 'V
 export const ROVERS = ['Rover (Aero)', 'Rover (Electro)', 'Rover (Havoc)', 'Rover (Spectro)']
 export const isRover = (name: string) => ROVERS.includes(name)
 
-export const CATEGORY_LABEL: Record<Category, string> = { premium: 'Premium characters', standard: 'Standard characters', fourstar: '4-star characters' }
+export const CATEGORY_LABEL: Record<Category, string> = { premium: 'Premium Characters', standard: 'Standard Characters', fourstar: '4-Star Characters' }
 
 export const RESONATORS: Resonator[] = RAW.split('|').map((s) => {
   const [name, e, r, p] = s.split(',')

@@ -62,16 +62,16 @@ export default function App() {
     <div className="shell">
       <header className="hero">
         <div>
-          <h1>Endstate Matrix team builder</h1>
+          <h1>Endstate Matrix Team Builder</h1>
           <label className="switch">
             <input type="checkbox" checked={cycle} onChange={(e) => setCycle(e.target.checked)} />
-            <span>Include cycle bonuses <b className="cycle-tag">{CYCLE_BONUS.name}, patch {CYCLE_BONUS.patch}</b></span>
+            <span>Include Cycle Bonuses <b className="cycle-tag">{CYCLE_BONUS.name}, Patch {CYCLE_BONUS.patch}</b></span>
           </label>
         </div>
         <motion.div className="readout" key={capacity} initial={{ opacity: 0.4, scale: 0.94 }} animate={{ opacity: 1, scale: 1 }} transition={{ type: 'spring', stiffness: 260, damping: 18 }} aria-live="polite">
           <span className="readout-num">{capacity}</span>
-          <span className="readout-label">{capacity === 1 ? 'team' : 'teams'} your roster can fill</span>
-          <span className="readout-sub">{rosterList.length} Resonators selected</span>
+          <span className="readout-label">{capacity === 1 ? 'Team' : 'Teams'} Your Roster Can Fill</span>
+          <span className="readout-sub">{rosterList.length} Resonators Selected</span>
         </motion.div>
       </header>
 
@@ -81,17 +81,17 @@ export default function App() {
       </section>
 
       <section className="panel" aria-labelledby="s2">
-        <h2 id="s2"><span className="step">2</span>Your own teams <small>optional</small></h2>
+        <h2 id="s2"><span className="step">2</span>Your Own Teams <small>Optional</small></h2>
         <OwnTeams roster={rosterList} teams={manual} usesOf={usesOf} onChange={setManual} />
       </section>
 
       <section className="panel" aria-labelledby="s3">
-        <h2 id="s3"><span className="step">3</span>Build the rest</h2>
+        <h2 id="s3"><span className="step">3</span>Build the Rest</h2>
         <div className="build-bar">
-          <button className="btn primary" onClick={build} disabled={busy || rosterList.length < 3}>{busy ? 'Building…' : 'Build teams'}</button>
+          <button className="btn primary" onClick={build} disabled={busy || rosterList.length < 3}>{busy ? 'Building…' : 'Build Teams'}</button>
           <label className="switch why-switch">
             <input type="checkbox" checked={why} onChange={(e) => setWhy(e.target.checked)} />
-            <span>Show team reasoning</span>
+            <span>Show Team Reasoning</span>
           </label>
         </div>
         <Results plan={built?.plan ?? null} busy={busy} stale={stale} showWhy={why} />
