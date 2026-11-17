@@ -45,6 +45,13 @@ function rng(seed: number) {
   }
 }
 
+const ROLE_ORDER = { 'Main DPS': 0, 'Sub-DPS': 1, Support: 2 } as const
+
+/** Display order inside a team: Main DPS first, then Sub-DPS, then Support (higher power first on ties). */
+export function orderTeam(team: Team): Team {
+  return team.sort((a, b) => ROLE_ORDER[BY_NAME[a].role] - ROLE_ORDER[BY_NAME[b].role] || BY_NAME[b].power - BY_NAME[a].power || a.localeCompare(b))
+}
+
 /** Number of full teams the pool can fill given each Resonator's remaining uses. */
 export function maxTeams(caps: Record<string, number>): number {
   return Math.min(24, Math.floor(Object.values(caps).reduce((a, b) => a + b, 0) / 3))
@@ -125,7 +132,6 @@ export function solve(pool: string[], caps: Record<string, number>, count: numbe
     const seg = best.slice(t * 3, t * 3 + 3).filter((n): n is string => !!n)
     if (seg.length) teams.push(seg)
   }
-  const order = { 'Main DPS': 0, 'Sub-DPS': 1, Support: 2 } as const
-  teams.forEach((t) => t.sort((a, b) => order[BY_NAME[a].role] - order[BY_NAME[b].role]))
+  teams.forEach(orderTeam)
   return teams.sort((a, b) => scoreTeam(b) - scoreTeam(a))
 }

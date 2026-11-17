@@ -9,11 +9,9 @@ interface Props {
   teams: Slot[][]
   usesOf: (n: string) => number
   onChange: (teams: Slot[][]) => void
-  onSendAll: () => void
-  onSendRemaining: () => void
 }
 
-export function OwnTeams({ roster, teams, usesOf, onChange, onSendAll, onSendRemaining }: Props) {
+export function OwnTeams({ roster, teams, usesOf, onChange }: Props) {
   const usage = countUsage(teams)
   const problems = teams.map((t) => teamProblem(t, usage, usesOf))
   const allValid = teams.length > 0 && problems.every((p) => p === null)
@@ -26,9 +24,6 @@ export function OwnTeams({ roster, teams, usesOf, onChange, onSendAll, onSendRem
       ? teams.length > 1 ? `All ${teams.length} teams are valid.` : 'Your team is valid.'
       : `Fix before sending: ${problems.map((p, i) => (p ? `team ${i + 1} ${p}` : '')).filter(Boolean).join('; ')}.`
     : ''
-  const sendAllReason = teams.length ? 'Remove your teams to send the full roster' : roster.length < 3 ? 'Select at least 3 Resonators first' : undefined
-  const sendRemReason = allValid ? undefined : 'Add at least one complete, valid team first'
-
   return (
     <div>
       <div className="toolbar"><button className="btn" onClick={() => onChange([...teams, [null, null, null]])}>Add a team</button></div>
@@ -54,10 +49,6 @@ export function OwnTeams({ roster, teams, usesOf, onChange, onSendAll, onSendRem
         </AnimatePresence>
       </div>
       {status && <p className={`status ${allValid ? 'ok' : 'bad'}`} role="status">{status}</p>}
-      <div className="toolbar">
-        <button className="btn primary" disabled={teams.length > 0 || roster.length < 3} title={sendAllReason} onClick={onSendAll}>Send roster</button>
-        <button className="btn primary" disabled={!allValid} title={sendRemReason} onClick={onSendRemaining}>Send remaining roster</button>
-      </div>
     </div>
   )
 }

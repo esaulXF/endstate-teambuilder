@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
-import { RESONATORS, usesFor, PERMANENT_TWO_USE } from '../src/data/characters'
+import { RESONATORS, BY_NAME, usesFor, PERMANENT_TWO_USE, isRover } from '../src/data/characters'
+import { planRest } from '../src/lib/plan'
 import { solve, maxTeams, teamProblem, countUsage } from '../src/lib/solver'
 
 const all = RESONATORS.map((c) => c.name)
@@ -47,3 +48,24 @@ const two = [['Aemeath', 'Lynae', 'Mornye'], ['Aemeath', 'Denia', 'Lupa']]
 assert.equal(teamProblem(two[1], countUsage(two), usesOf), 'uses a Resonator more often than allowed')
 assert.equal(teamProblem(['Aemeath', 'Lynae', 'Mornye'], countUsage([['Aemeath', 'Lynae', 'Mornye']]), usesOf), null)
 console.log('all solver tests passed')
+
+// Display order inside every built team: Main DPS, then Sub-DPS, then Support.
+const rank = { 'Main DPS': 0, 'Sub-DPS': 1, Support: 2 } as const
+for (const t of a.teams.concat(b.teams, c.teams)) {
+  const r = t.map((n) => rank[BY_NAME[n].role])
+  assert.deepEqual(r, [...r].sort((x, y) => x - y), `bad order in ${t.join(', ')}`)
+}
+
+// Automatic plan: no teams of your own, valid own teams, invalid own teams, too few Resonators.
+const usesNoCycle = (n: string) => usesFor(n, false)
+const full = planRest(all.filter((n) => !isRover(n) || n === 'Rover (Aero)'), [], usesNoCycle)
+assert.equal(full.kind, 'ready')
+const withOwn = planRest(all, [['Aemeath', 'Lynae', 'Mornye']], usesNoCycle)
+assert.equal(withOwn.kind, 'ready')
+if (withOwn.kind === 'ready') {
+  assert.ok(!withOwn.teams.flat().includes('Aemeath') && !withOwn.teams.flat().includes('Lynae'), 'own-team Resonators reused')
+  assert.equal(withOwn.teams.flat().filter((n) => n === 'Mornye').length <= 1, true, 'Mornye should have one use left')
+}
+assert.equal(planRest(all, [['Aemeath', 'Lynae', null]], usesNoCycle).kind, 'fix')
+assert.equal(planRest(['Aemeath', 'Lynae'], [], usesNoCycle).kind, 'empty')
+console.log('plan and ordering tests passed')

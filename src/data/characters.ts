@@ -40,6 +40,9 @@ const FOUR_STAR = new Set(['Aalto', 'Baizhi', 'Buling', 'Chixia', 'Danjin', 'Lum
 // Standard-banner 5-stars plus the Rover forms. Every other 5-star is premium (limited).
 export const STANDARD = new Set(['Calcharo', 'Encore', 'Jianxin', 'Lingyang', 'Verina', 'Rover (Aero)', 'Rover (Electro)', 'Rover (Havoc)', 'Rover (Spectro)'])
 
+export const ROVERS = ['Rover (Aero)', 'Rover (Electro)', 'Rover (Havoc)', 'Rover (Spectro)']
+export const isRover = (name: string) => ROVERS.includes(name)
+
 export const CATEGORY_LABEL: Record<Category, string> = { premium: 'Premium characters', standard: 'Standard characters', fourstar: '4-star characters' }
 
 export const RESONATORS: Resonator[] = RAW.split('|').map((s) => {
