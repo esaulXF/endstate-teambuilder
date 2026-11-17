@@ -1,11 +1,11 @@
-import { countUsage, maxTeams, solve, teamProblem, type Team } from './solver'
+import { countUsage, feasible2, maxTeams, maxTeamsWithSalvage, salvage, solve, teamProblem, type Team } from './solver'
 
 export type Slot = string | null
 
 export type Plan =
   | { kind: 'empty' } // fewer than 3 Resonators selected
   | { kind: 'fix' } // own teams exist but are incomplete or break a rule
-  | { kind: 'ready'; summary: string; teams: Team[]; leftover: string[]; spare: Record<string, number>; manual: string[][] }
+  | { kind: 'ready'; summary: string; teams: Team[]; leftover: string[]; salvaged: number; spare: Record<string, number>; manual: string[][] }
 
 export function manualProblems(manual: Slot[][], usesOf: (n: string) => number) {
   const usage = countUsage(manual)
@@ -21,7 +21,16 @@ export function planRest(roster: string[], manual: Slot[][], usesOf: (n: string)
   roster.forEach((n) => (caps[n] = usesOf(n) - (used[n] || 0)))
   const pool = roster.filter((n) => caps[n] > 0)
   const usedUp = roster.filter((n) => caps[n] <= 0)
-  const teams = solve(pool, caps, maxTeams(caps))
+  // Most teams in total: strict teams first, plus salvage teams (two Supports allowed) from what is left.
+  const total = maxTeamsWithSalvage(caps)
+  let m = Math.min(maxTeams(caps), total)
+  while (m > 0 && !feasible2(caps, m, total - m)) m--
+  const main = solve(pool, caps, m, total - m)
+  const mainUse = countUsage(main)
+  const rest: Record<string, number> = {}
+  pool.forEach((n) => { const r = caps[n] - (mainUse[n] || 0); if (r > 0) rest[n] = r })
+  const extra = salvage(rest, total - main.length)
+  const teams = [...main, ...extra]
   const inTeams = new Set(teams.flat())
   const own = manual.map((t) => t.filter((n): n is string => !!n))
   const summary = own.length
@@ -30,5 +39,5 @@ export function planRest(roster: string[], manual: Slot[][], usesOf: (n: string)
   const spare: Record<string, number> = {}
   const usedHere = countUsage(teams)
   pool.forEach((n) => { const r = caps[n] - (usedHere[n] || 0); if (r > 0) spare[n] = r })
-  return { kind: 'ready', summary, teams, leftover: pool.filter((n) => !inTeams.has(n)), spare, manual: own }
+  return { kind: 'ready', summary, teams, leftover: pool.filter((n) => !inTeams.has(n)), salvaged: extra.length, spare, manual: own }
 }

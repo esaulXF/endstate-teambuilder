@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import { BY_NAME, CYCLE_BONUS, isRover, usesFor } from './data/characters'
-import { maxTeams } from './lib/solver'
+import { maxTeamsWithSalvage } from './lib/solver'
 import { planRest, type Plan } from './lib/plan'
 import { usePersistent } from './lib/storage'
 import { Roster } from './components/Roster'
@@ -60,7 +60,7 @@ export default function App() {
   const capacity = useMemo(() => {
     const caps: Record<string, number> = {}
     rosterList.forEach((n) => (caps[n] = usesFor(n, cycle)))
-    return maxTeams(caps)
+    return maxTeamsWithSalvage(caps)
   }, [rosterList, cycle])
 
   const toggle = (n: string) => {

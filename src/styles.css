@@ -104,7 +104,7 @@ button, select, input { font: inherit; color: inherit; }
 button { cursor: pointer; }
 :focus-visible { outline: 2px solid var(--sec); outline-offset: 2px; }
 
-.shell { max-width: 1120px; margin: 0 auto; padding: calc(24px + env(safe-area-inset-top, 0)) 16px calc(56px + env(safe-area-inset-bottom, 0)); display: grid; gap: 20px; }
+.shell { max-width: 2000px; margin: 0 auto; padding: calc(24px + env(safe-area-inset-top, 0)) clamp(16px, 3vw, 56px) calc(56px + env(safe-area-inset-bottom, 0)); display: grid; gap: 20px; }
 .topbar { display: flex; justify-content: flex-end; }
 
 .theme-switch { position: relative; display: inline-grid; grid-template-columns: repeat(3, 1fr); padding: 3px; border: 1px solid var(--acc); border-radius: 999px; background: oklch(var(--sec-c) / 0.12); }
@@ -181,7 +181,7 @@ select.field { cursor: pointer; }
 .divider small { font: 500 13px var(--body); color: var(--dim); }
 .subdivider { font: 600 18px var(--display); color: var(--dim); margin: 18px 0 8px; }
 .results.busy { opacity: 0.55; transition: opacity 0.15s; }
-.roster-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(236px, 1fr)); gap: 10px; margin-top: 14px; }
+.roster-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(212px, 1fr)); gap: 10px; margin-top: 14px; }
 .tile {
   --clip: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
   position: relative; isolation: isolate; text-align: left; display: flex; align-items: center; gap: 12px;
@@ -216,6 +216,7 @@ select.field { cursor: pointer; }
 .team-card { position: relative; padding: 14px; background: var(--raise); border: 1px solid var(--line); border-top: 3px solid var(--acc); display: grid; gap: 8px; align-content: start; }
 .team-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; }
 .team-head h3 { font-size: 22px; }
+.desc.salv { margin-left: 8px; color: var(--hl); border-color: var(--hl); }
 .team-head h3 .desc { margin-left: 10px; font: 600 14px var(--body); color: var(--hl); letter-spacing: 0.02em; }
 .slot { width: 100%; }
 .member { display: flex; align-items: center; gap: 11px; padding: 8px 10px; background: oklch(var(--abyss-c) / 0.55); border-left: 3px solid var(--el); }
@@ -258,3 +259,18 @@ select.field { cursor: pointer; }
 }
 
 :root:is([data-theme='light'], [data-theme='flamingo']) .tile[aria-pressed='true'] .tile-meta { color: var(--ink); }
+
+/* ---------- wide screens: two columns and a larger UI ---------- */
+@media (min-width: 1100px) {
+  .shell { grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); align-items: start; gap: 22px; }
+  .shell > .topbar, .shell > .hero, .shell > .foot { grid-column: 1 / -1; }
+  .shell > .foot { grid-row: 6; }
+  .hero { padding: 0; }
+  .shell > .panel:nth-of-type(1) { grid-column: 1; grid-row: 4 / span 2; }
+  .shell > .panel:nth-of-type(2) { grid-column: 2; grid-row: 4; }
+  .shell > .panel:nth-of-type(3) { grid-column: 2; grid-row: 5; }
+  .hero h1 { font-size: clamp(44px, 4.2vw, 84px); }
+}
+@media (min-width: 1700px) { .shell { zoom: 1.15; } }
+@media (min-width: 2100px) { .shell { zoom: 1.35; } }
+@media (min-width: 2700px) { .shell { zoom: 1.7; } }

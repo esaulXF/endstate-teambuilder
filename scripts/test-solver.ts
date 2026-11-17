@@ -144,3 +144,16 @@ console.log('rover tests passed')
   }
   console.log('rover swap tests passed')
 }
+
+// ---- salvage teams ----
+{
+  const { planRest: plan2 } = await import('../src/lib/plan')
+  const roster = ['Shorekeeper', 'Verina', 'Mornye', 'Baizhi', 'Hsin', 'Aemeath', 'Galbrena']
+  const p = plan2(roster, [], (n) => usesFor(n, false)) as Extract<ReturnType<typeof plan2>, { kind: 'ready' }>
+  const supports = (t: string[]) => t.filter((n) => BY_NAME[n].role === 'Support').length
+  p.teams.forEach((t, i) => assert.ok(supports(t) <= (i >= p.teams.length - p.salvaged ? 2 : 1), `too many Supports in ${t.join(', ')}`))
+  p.teams.slice(0, p.teams.length - p.salvaged).forEach((t) => assert.ok(supports(t) <= 1, 'real teams never hold two Supports'))
+  p.teams.forEach((t) => assert.ok(t.some((n) => BY_NAME[n].role !== 'Support'), 'every team has a damage dealer'))
+  assert.ok(p.salvaged >= 1, 'leftover Supports form a salvage team')
+  console.log('salvage tests passed')
+}

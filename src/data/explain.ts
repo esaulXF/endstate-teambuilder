@@ -12,6 +12,7 @@ export interface ExplainContext {
   teams: string[][] // all built teams, in order
   manual: string[][] // the player's own teams
   index: number // position of this team in `teams`
+  salvage?: boolean // built from leftover uses, so two Supports are allowed
 }
 
 const tagOf = (w: string) => w.split(':')[0] as Eff
@@ -60,6 +61,8 @@ export function explainTeam(team: string[], ctx: ExplainContext): Explain {
   } else if (bb?.exact) {
     lines.push(`Matches the known ${bb.build.tier} ${buildLabel(bb.build.arch)} build exactly, so it gets the full build bonus.`)
   }
+
+  if (ctx.salvage) lines.push(`Salvage team: built from leftover uses after the real teams were set. Two Supports are allowed here${team.filter((n) => BY_NAME[n].role === 'Support').length > 1 ? ', and this team uses that exception' : ', although this one did not need it'}.`)
 
   // Roles
   const byRole = (r: string) => team.filter((n) => BY_NAME[n].role === r)
