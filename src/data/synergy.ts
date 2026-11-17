@@ -121,22 +121,23 @@ export const PROFILES: Record<string, Profile> = {
 // ---- Known builds (community tiers for patch 3.8) ----
 export type Tier = 'T0' | 'T0.5' | 'T1' | 'T2' | 'T3' | 'F2P'
 export const TIER_POINTS: Record<Tier, number> = { T0: 10, 'T0.5': 8, T1: 6, T2: 4, T3: 2, F2P: 1 }
-export interface Build { team: [string, string, string]; tier: Tier; arch: ArchetypeId }
+export interface Build { team: [string, string, string]; tier: Tier; arch: ArchetypeId | ArchetypeId[] }
 
-const B = (tier: Tier, arch: ArchetypeId, ...teams: string[]): Build[] => teams.map((t) => ({ tier, arch, team: t.split('/') as [string, string, string] }))
+const B = (tier: Tier, arch: ArchetypeId | ArchetypeId[], ...teams: string[]): Build[] => teams.map((t) => ({ tier, arch, team: t.split('/') as [string, string, string] }))
 const YX = 'Yangyang: Xuanling', RE = 'Rover (Electro)', RA = 'Rover (Aero)', RS = 'Rover (Spectro)', RH = 'Rover (Havoc)', LH = 'Luuk Herssen', XY = 'Xiangli Yao'
 
 export const BUILDS: Build[] = [
-  ...B('T0', 'unison', 'Hsin/Suoming/Lily'),
+  ...B('T0', ['unison', 'echo-skill'], 'Hsin/Suoming/Lily'),
   ...B('T0', 'havoc-bane', `${YX}/Chisa/Suisui`),
   ...B('T0', 'tune-break', 'Qingxiao/Denia/Mornye'),
   ...B('T0', 'heavy-shield', 'Jingran/Iuno/Shorekeeper'),
-  ...B('T0.5', 'glacio-chafe', 'Hiyuki/Lucilla/Chisa', 'Hiyuki/Lucilla/Suisui'),
+  ...B('T0.5', ['glacio-chafe', 'havoc-bane'], 'Hiyuki/Lucilla/Chisa'),
+  ...B('T0.5', 'glacio-chafe', 'Hiyuki/Lucilla/Suisui'),
   ...B('T0.5', 'tune-break', 'Aemeath/Lynae/Mornye', 'Aemeath/Denia/Chisa', `${LH}/Denia/Mornye`),
   ...B('T0.5', 'echo-skill', 'Sigrika/Qiuyuan/Lily'),
   ...B('T0.5', 'electro-flare', `Hsin/${RE}/Buling`, `Hsin/${RE}/Suisui`),
   ...B('T1', 'echo-skill', 'Sigrika/Qiuyuan/Shorekeeper', 'Sigrika/Lucilla/Shorekeeper', 'Sigrika/Qiuyuan/Ciaccona', 'Sigrika/Lucilla/Lily', 'Galbrena/Qiuyuan/Shorekeeper', 'Galbrena/Lupa/Mornye', 'Galbrena/Lupa/Shorekeeper', 'Galbrena/Qiuyuan/Lily'),
-  ...B('T1', 'coordinated', 'Phrolova/Cantarella/Qiuyuan', 'Phrolova/Cantarella/Shorekeeper', 'Phrolova/Cantarella/Buling'),
+  ...B('T1', ['echo-skill', 'coordinated'], 'Phrolova/Cantarella/Qiuyuan', 'Phrolova/Cantarella/Shorekeeper', 'Phrolova/Cantarella/Buling'),
   ...B('T1', 'heavy-shield', 'Augusta/Iuno/Shorekeeper', 'Augusta/Rebecca/Shorekeeper', 'Jingran/Lupa/Mornye', 'Jingran/Lynae/Mornye', 'Iuno/Yinlin/Shorekeeper'),
   ...B('T1', 'tune-break', 'Qingxiao/Lynae/Mornye', 'Qingxiao/Sanhua/Mornye', 'Qingxiao/Denia/Ciaccona', `${LH}/Lynae/Mornye`, 'Suoming/Lynae/Mornye', 'Aemeath/Lupa/Mornye', 'Galbrena/Denia/Lupa'),
   ...B('T1', 'havoc-bane', `${YX}/Rebecca/Chisa`, `${YX}/Rebecca/Suisui`, `${YX}/Lynae/Mornye`, `${YX}/Phrolova/Shorekeeper`, `${YX}/Chisa/Shorekeeper`, 'Hiyuki/Lynae/Chisa', 'Hiyuki/Chisa/Shorekeeper', 'Hiyuki/Lynae/Mornye', `Hsin/${RE}/Chisa`),
@@ -146,7 +147,8 @@ export const BUILDS: Build[] = [
   ...B('T2', 'frazzle', `Zani/Phoebe/${RS}`, 'Zani/Phoebe/Shorekeeper', `Zani/${RS}/Baizhi`, `Phoebe/${RS}/Chisa`),
   ...B('T2', 'skill-fusion', 'Jinhsi/Zhezhi/Verina', 'Jinhsi/Yuanwu/Verina', 'Galbrena/Lupa/Brant', 'Changli/Lupa/Brant', 'Carlotta/Lynae/Mornye'),
   ...B('T2', 'havoc-bane', `${YX}/Mortefi/Chisa`),
-  ...B('T2', 'coordinated', 'Phrolova/Roccia/Cantarella', 'Phrolova/Danjin/Buling', 'Sanhua/Cantarella/Shorekeeper'),
+  ...B('T2', ['echo-skill', 'coordinated'], 'Phrolova/Roccia/Cantarella', 'Phrolova/Danjin/Buling'),
+  ...B('T2', 'coordinated', 'Sanhua/Cantarella/Shorekeeper'),
   ...B('T2', 'hack', 'Lucy/Rebecca/Verina'),
   ...B('T2', 'heavy-shield', 'Augusta/Mortefi/Shorekeeper'),
   ...B('T3', 'skill-fusion', 'Carlotta/Zhezhi/Shorekeeper', 'Carlotta/Zhezhi/Baizhi', 'Carlotta/Zhezhi/Buling', 'Changli/Chixia/Baizhi', 'Jinhsi/Zhezhi/Buling'),
@@ -225,10 +227,12 @@ export function synergyScore(team: string[], isDps: (n: string) => boolean): num
   return Math.min(s, LINK_CAP) + (bb ? TIER_POINTS[bb.build.tier] * (bb.exact ? 1 : 0.3) : 0)
 }
 
+export const buildLabel = (arch: ArchetypeId | ArchetypeId[]) => (Array.isArray(arch) ? arch : [arch]).map((a) => ARCHETYPES[a].label).join(' / ')
+
 /** Short label for a team shown next to its number, e.g. "Glacio Chafe" or "Havoc Bane". */
 export function describeTeam(team: string[], roleOf: (n: string) => string): string {
   const bb = bestBuild(team)
-  if (bb?.exact) return ARCHETYPES[bb.build.arch].label
+  if (bb?.exact) return buildLabel(bb.build.arch)
   const score = new Map<ArchetypeId, number>()
   const members = team.filter((n) => PROFILES[n])
   for (const n of members) {
@@ -237,8 +241,12 @@ export function describeTeam(team: string[], roleOf: (n: string) => string): str
   }
   const count = (a: ArchetypeId) => members.filter((n) => PROFILES[n].arch.includes(a)).length
   const ranked = [...score.entries()].filter(([a]) => a !== 'starter' && count(a) >= 2).sort((x, y) => y[1] - x[1])
-  if (ranked.length) return ARCHETYPES[ranked[0][0]].label
+  if (ranked.length) {
+    // Two strong build types in one team get a double label.
+    const second = ranked[1] && ranked[1][1] >= ranked[0][1] * 0.75 ? ranked[1][0] : null
+    return buildLabel(second ? [ranked[0][0], second] : ranked[0][0])
+  }
   if (members.every((n) => PROFILES[n].arch.every((a) => a === 'starter'))) return 'Early game'
-  if (bb) return ARCHETYPES[bb.build.arch].label
+  if (bb) return buildLabel(bb.build.arch)
   return 'Mixed'
 }

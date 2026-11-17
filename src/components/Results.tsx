@@ -2,7 +2,7 @@ import { motion } from 'framer-motion'
 import { BY_NAME } from '../data/characters'
 import { ELEMENT_COLOR, Medal, Stars } from './Medal'
 import type { Plan } from '../lib/plan'
-import { ARCHETYPES, bestBuild, describeTeam, teamLinks } from '../data/synergy'
+import { bestBuild, buildLabel, describeTeam, teamLinks } from '../data/synergy'
 
 const isDps = (n: string) => BY_NAME[n].role !== 'Support'
 
@@ -12,7 +12,7 @@ function Tags({ team }: { team: string[] }) {
   if (!bb && !links.length) return null
   return (
     <div className="tags">
-      {bb && <span className={`tag tier-${bb.build.tier.replace('.', '')}`} title={bb.exact ? 'Known build' : 'Close to a known build'}>{bb.build.tier} {ARCHETYPES[bb.build.arch].label}{bb.exact ? '' : ' (close)'}</span>}
+      {bb && <span className={`tag tier-${bb.build.tier.replace('.', '')}`} title={bb.exact ? 'Known build' : 'Close to a known build'}>{bb.build.tier} {buildLabel(bb.build.arch)}{bb.exact ? '' : ' (close)'}</span>}
       {links.map((l) => <span key={l.from + l.to + l.effect} className="tag">{l.from} gives {l.to} {l.effect}</span>)}
     </div>
   )
