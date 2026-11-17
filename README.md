@@ -5,10 +5,3 @@ and the builder splits the rest into as many full teams of three as your roster 
 
 Not affiliated with Kuro Games. Wuthering Waves and related names belong to Kuro Games.
 Power ratings and team synergies are rough estimates, not official data.
-
-## How the rules work
-
-- Most Resonators can be used in one team.
-- Shorekeeper, Verina, Mornye, Baizhi, Suisui and Buling can be used in two teams (permanent).
-- The "Include current cycle bonuses" switch adds the current cycle's Emergency Agent second uses.
-- Step 2 checks your own teams before anything is sent on. Resonators you used there are removed from step 3.
