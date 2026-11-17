@@ -34,7 +34,7 @@
   --fade: 58%;
   --fade-base: oklch(0.2 0.012 252); /* near-neutral, so the element colour keeps its own hue */
 }
-:root[data-theme='light'] {
+:root[data-theme='light'], :root[data-theme='flamingo'] {
   color-scheme: light;
   --abyss-c: 0.928 0.018 65;
   --panel-c: 0.955 0.014 68;
@@ -60,6 +60,23 @@
   --fade: 78%;
   --fade-base: oklch(var(--panel-c));
   --el-havoc: oklch(0.57 0.21 352);
+}
+/* Flamingo: Flamingo Pink #FAC7E1 primary, Plum Pink #A5467C secondary, Electric Blue #004AFD accent.
+   Shares the light-mode element, rarity and fade settings above and only swaps the palette. */
+:root[data-theme='flamingo'] {
+  --abyss-c: 0.882 0.067 346.5;
+  --panel-c: 0.935 0.038 346;
+  --raise-c: 0.962 0.026 346;
+  --edge-c: 0.79 0.085 346;
+  --ink-c: 0.27 0.09 348;
+  --mist-c: 0.35 0.1 348;
+  --dim-c: 0.45 0.1 348;
+  --sec-c: 0.536 0.14 347.6;
+  --hl-c: 0.42 0.13 348;
+  --acc-c: 0.513 0.269 263.3;
+  --on-sec-c: 0.97 0.02 346;
+  --good-c: 0.46 0.12 160;
+  --bad-c: 0.48 0.2 25;
 }
 :root {
   --abyss: oklch(var(--abyss-c)); --panel: oklch(var(--panel-c)); --raise: oklch(var(--raise-c)); --edge: oklch(var(--edge-c));
@@ -90,16 +107,14 @@ button { cursor: pointer; }
 .shell { max-width: 1120px; margin: 0 auto; padding: calc(24px + env(safe-area-inset-top, 0)) 16px calc(56px + env(safe-area-inset-bottom, 0)); display: grid; gap: 20px; }
 .topbar { display: flex; justify-content: flex-end; }
 
-.theme-toggle { position: relative; display: inline-flex; align-items: center; width: 68px; height: 34px; padding: 0; border: 1px solid var(--acc); border-radius: 999px; background: oklch(var(--sec-c) / 0.12); }
-.theme-toggle:hover { background: oklch(var(--sec-c) / 0.24); }
-.theme-toggle .ico { position: absolute; inset: 5px; width: 16px; height: 16px; color: var(--on-sec); transition: opacity 0.25s, rotate 0.32s; }
-.theme-toggle .ico.sun { opacity: 0; rotate: -90deg; }
-.theme-toggle[aria-checked='true'] .ico.moon { opacity: 0; rotate: 90deg; }
-.theme-toggle[aria-checked='true'] .ico.sun { opacity: 1; rotate: 0deg; color: oklch(0.2 0.05 352); }
-.theme-toggle .knob { position: absolute; top: 3px; left: 3px; width: 26px; height: 26px; border-radius: 50%; background: var(--sec); box-shadow: 0 1px 6px oklch(0 0 0 / 0.35); transition: transform 0.32s cubic-bezier(0.5, 0, 0.2, 1), background 0.3s; }
-.theme-toggle[aria-checked='true'] .knob { transform: translateX(34px); background: var(--acc); }
-.theme-toggle:focus-visible { outline: 2px solid var(--sec); outline-offset: 3px; }
-.theme-label { margin-right: 10px; font-weight: 500; }
+.theme-switch { position: relative; display: inline-grid; grid-template-columns: repeat(3, 1fr); padding: 3px; border: 1px solid var(--acc); border-radius: 999px; background: oklch(var(--sec-c) / 0.12); }
+.theme-switch .slider { position: absolute; top: 3px; bottom: 3px; left: 3px; width: calc((100% - 6px) / 3); border-radius: 999px; background: var(--sec); box-shadow: 0 1px 6px oklch(0 0 0 / 0.3); transform: translateX(calc(var(--i, 0) * 100%)); transition: transform 0.34s cubic-bezier(0.5, 0, 0.2, 1); }
+.theme-switch .seg { position: relative; z-index: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-width: 38px; height: 30px; padding: 0 12px; border: 0; border-radius: 999px; background: none; color: var(--dim); font-weight: 600; font-size: 14px; transition: color 0.25s; }
+.theme-switch .seg svg { width: 15px; height: 15px; flex: none; }
+.theme-switch .seg[aria-checked='true'] { color: var(--on-sec); }
+.theme-switch .seg:not([aria-checked='true']):hover { color: var(--ink); }
+.theme-switch .seg:focus-visible { outline: 2px solid var(--ink); outline-offset: -3px; }
+@media (max-width: 520px) { .theme-switch .seg span { display: none; } .theme-switch .seg { padding: 0 10px; } }
 .topbar { align-items: center; }
 
 /* ---------- hero ---------- */
@@ -238,4 +253,4 @@ select.field { cursor: pointer; }
   * { transition: none !important; }
 }
 
-:root[data-theme='light'] .tile[aria-pressed='true'] .tile-meta { color: var(--ink); }
+:root:is([data-theme='light'], [data-theme='flamingo']) .tile[aria-pressed='true'] .tile-meta { color: var(--ink); }
