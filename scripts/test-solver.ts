@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { RESONATORS, BY_NAME, usesFor, PERMANENT_TWO_USE, isRover } from '../src/data/characters'
+import { RESONATORS, BY_NAME, usesFor, PERMANENT_TWO_USE, isRover, ROVERS } from '../src/data/characters'
 import { planRest } from '../src/lib/plan'
 import { solve, maxTeams, teamProblem, countUsage } from '../src/lib/solver'
 
@@ -135,3 +135,12 @@ console.log('composition and explanation tests passed')
 assert.equal(bestBuild2(['Iuno', 'Ciaccona', 'Rover (Electro)'])?.build.team.includes('Rover (Aero)') ?? false, false, 'Rover (Electro) must not count as Rover (Aero)')
 assert.equal(bestBuild2(['Iuno', 'Ciaccona', 'Rover (Aero)'])?.exact, true, 'the real Rover (Aero) team is still recognised')
 console.log('rover tests passed')
+{
+  const { BUILDS } = await import('../src/data/synergy')
+  for (const b of BUILDS) for (const r of ROVERS) if (b.team.includes(r)) for (const o of ROVERS) if (o !== r) {
+    const t = b.team.map((m) => (m === r ? o : m))
+    const m = bestBuild2(t)
+    assert.ok(!(m && m.build.team.includes(r) && !t.includes(r)), `${o} must not stand in for ${r} in ${b.team.join('/')}`)
+  }
+  console.log('rover swap tests passed')
+}
